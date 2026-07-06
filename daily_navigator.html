@@ -1,0 +1,2115 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0c1220" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Daily Navigator</title>
+  <style>
+    :root {
+      --bg: #0c1220;
+      --bg-soft: #121b30;
+      --panel: rgba(15, 22, 40, 0.88);
+      --panel-strong: rgba(20, 31, 55, 0.95);
+      --text: #eef4ff;
+      --muted: #b2c0db;
+      --accent: #6ee7b7;
+      --accent-2: #7cc7ff;
+      --good: #86efac;
+      --warn: #facc15;
+      --danger: #fb7185;
+      --border: rgba(160, 177, 211, 0.16);
+      --shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+      --card-radius: 22px;
+      --card-padding: 18px;
+      --control-height: 46px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+      color: var(--text);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at top left, rgba(124, 199, 255, 0.18), transparent 32%),
+        radial-gradient(circle at top right, rgba(110, 231, 183, 0.12), transparent 28%),
+        linear-gradient(180deg, #0b1020 0%, #0d1424 42%, #09111d 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.65), transparent 90%);
+    }
+
+    .app {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 28px 20px 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    .hero {
+      max-width: 760px;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 44px);
+      line-height: 1;
+      letter-spacing: 0.02em;
+    }
+
+    .lead {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.5;
+      max-width: 60ch;
+    }
+
+    .pill-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(110, 231, 183, 0.1);
+      color: var(--accent);
+      font-size: 13px;
+      border: 1px solid rgba(110, 231, 183, 0.16);
+      backdrop-filter: blur(10px);
+      text-decoration: none;
+    }
+
+    section[id] {
+      scroll-margin-top: 18px;
+    }
+
+    .status-panel {
+      min-width: 280px;
+      padding: 16px 18px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(15, 25, 46, 0.95), rgba(11, 19, 36, 0.92));
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+
+    .status-panel .date-box {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .status-panel strong {
+      display: block;
+      color: var(--text);
+      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--panel), var(--panel-strong));
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: var(--card-padding);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .span-12 { grid-column: span 12; }
+    .span-8 { grid-column: span 8; }
+    .span-6 { grid-column: span 6; }
+    .span-4 { grid-column: span 4; }
+
+    .card h2 {
+      margin: 0 0 6px;
+      font-size: 20px;
+      line-height: 1.2;
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-note,
+    .muted,
+    .small {
+      color: var(--muted);
+    }
+
+    .small {
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .summary-card {
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 16px;
+    }
+
+    .summary-card::after {
+      content: "";
+      position: absolute;
+      inset: auto -60px -60px auto;
+      width: 220px;
+      height: 220px;
+      background: radial-gradient(circle, rgba(124, 199, 255, 0.18), transparent 70%);
+      pointer-events: none;
+    }
+
+    .summary-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .summary-top p {
+      margin: 0;
+      max-width: 60ch;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .summary-stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .stat {
+      border-radius: 16px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--text);
+    }
+
+    .progress-wrap {
+      width: 100%;
+      height: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      transition: width 0.25s ease;
+      border-radius: inherit;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 14px;
+      padding: 11px 15px;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), #4fd1c5);
+      color: #04231b;
+      font-weight: 700;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      box-shadow: 0 10px 20px rgba(78, 209, 197, 0.22);
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    .tasks,
+    .schedule {
+      display: grid;
+      gap: 10px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .focus-card {
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    .focus-card.is-active {
+      border-color: rgba(124, 199, 255, 0.35);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(124, 199, 255, 0.18);
+    }
+
+    .focus-card.is-done {
+      border-color: rgba(134, 239, 172, 0.3);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(134, 239, 172, 0.18);
+    }
+
+    .focus-hint {
+      margin-bottom: 10px;
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .focus-input.is-empty {
+      border-color: rgba(250, 204, 21, 0.45);
+    }
+
+    .focus-label.is-done {
+      color: var(--good);
+      text-decoration: line-through;
+    }
+
+    .mini-plan {
+      display: grid;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .mini-plan-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .mini-plan-item {
+      padding: 8px 10px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .progress-summary {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .progress-summary-line {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .progress-summary-note {
+      color: var(--text);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .link-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: var(--control-height);
+      padding: 11px 15px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+    }
+
+    .row:hover {
+      transform: translateY(-1px);
+      background: rgba(255, 255, 255, 0.045);
+    }
+
+    .row.is-done {
+      background: rgba(110, 231, 183, 0.1);
+      border-color: rgba(110, 231, 183, 0.2);
+    }
+
+    .row label {
+      flex: 1;
+      cursor: pointer;
+      line-height: 1.4;
+    }
+
+    input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      min-width: 44px;
+      min-height: 44px;
+      margin: -12px 0;
+      accent-color: var(--accent);
+      flex: 0 0 auto;
+      cursor: pointer;
+    }
+
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      background: rgba(4, 10, 22, 0.45);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 11px 12px;
+      outline: none;
+      font-size: 14px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    input[type="text"],
+    select {
+      min-height: var(--control-height);
+    }
+
+    input[type="text"]:focus,
+    textarea:focus,
+    select:focus {
+      border-color: rgba(124, 199, 255, 0.45);
+      box-shadow: 0 0 0 3px rgba(124, 199, 255, 0.12);
+      background: rgba(4, 10, 22, 0.62);
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+
+    ::placeholder {
+      color: rgba(178, 192, 219, 0.82);
+    }
+
+    .time-block {
+      display: grid;
+      grid-template-columns: 104px 1fr;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .time {
+      color: var(--accent-2);
+      font-weight: 700;
+    }
+
+    .save-status {
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .minimum-day-status {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .minimum-day-status.is-closed {
+      color: var(--good);
+      background: rgba(134, 239, 172, 0.12);
+      border-color: rgba(134, 239, 172, 0.28);
+    }
+
+    .objects-toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .objects-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .object-card {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .object-card h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .object-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .object-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .section-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .section-item {
+      display: grid;
+      gap: 8px;
+    }
+
+    .habit-calendar {
+      display: grid;
+      gap: 12px;
+    }
+
+    .habit-calendar-head,
+    .habit-row {
+      display: grid;
+      grid-template-columns: minmax(160px, 220px) 1fr 120px;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .habit-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+    }
+
+    .habit-cell {
+      min-height: 32px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .habit-cell.is-active {
+      background: rgba(110, 231, 183, 0.14);
+      border-color: rgba(110, 231, 183, 0.3);
+      color: var(--good);
+      font-weight: 700;
+    }
+
+    .habit-streak {
+      text-align: right;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .overview-cell {
+      min-height: 56px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.04);
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 8px 6px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.3;
+    }
+
+    .overview-cell.is-closed {
+      background: rgba(134, 239, 172, 0.12);
+      border-color: rgba(134, 239, 172, 0.28);
+      color: var(--good);
+      font-weight: 700;
+    }
+
+    .overview-total {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .save-status.error {
+      color: var(--danger);
+    }
+
+    .menu-toggle {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border-radius: 14px;
+      background: rgba(110, 231, 183, 0.1);
+      border: 1px solid rgba(110, 231, 183, 0.16);
+      color: var(--accent);
+      box-shadow: none;
+      flex: 0 0 auto;
+    }
+
+    .menu-toggle:hover {
+      transform: none;
+      background: rgba(110, 231, 183, 0.16);
+    }
+
+    .menu-toggle-icon,
+    .menu-toggle-icon::before,
+    .menu-toggle-icon::after {
+      display: block;
+      width: 20px;
+      height: 2px;
+      border-radius: 999px;
+      background: currentColor;
+      position: relative;
+    }
+
+    .menu-toggle-icon::before,
+    .menu-toggle-icon::after {
+      content: "";
+      position: absolute;
+      left: 0;
+    }
+
+    .menu-toggle-icon::before {
+      top: -6px;
+    }
+
+    .menu-toggle-icon::after {
+      top: 6px;
+    }
+
+    .mobile-nav-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      background: rgba(4, 8, 16, 0.62);
+      backdrop-filter: blur(2px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .mobile-nav-overlay.is-open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .mobile-nav {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 100;
+      width: min(300px, 86vw);
+      padding: 18px 16px 24px;
+      background: linear-gradient(180deg, rgba(15, 25, 46, 0.98), rgba(11, 19, 36, 0.98));
+      border-right: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      transform: translateX(-105%);
+      transition: transform 0.24s ease;
+      overflow-y: auto;
+    }
+
+    .mobile-nav.is-open {
+      transform: translateX(0);
+    }
+
+    .mobile-nav-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .mobile-nav-title {
+      margin: 0;
+      font-size: 18px;
+      color: var(--text);
+    }
+
+    .mobile-nav-close {
+      width: 44px;
+      height: 44px;
+      padding: 0;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: none;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .mobile-nav-close:hover {
+      transform: none;
+    }
+
+    .mobile-nav-links {
+      display: grid;
+      gap: 8px;
+    }
+
+    .mobile-nav-link {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: rgba(110, 231, 183, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(110, 231, 183, 0.16);
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .mobile-nav-link:hover {
+      background: rgba(110, 231, 183, 0.16);
+    }
+
+    body.menu-open {
+      overflow: hidden;
+    }
+
+    @media (max-width: 900px) {
+      .menu-toggle {
+        display: inline-flex;
+      }
+
+      .mobile-nav,
+      .mobile-nav-overlay {
+        display: block;
+      }
+
+      .pill-row {
+        display: none;
+      }
+
+      .span-8,
+      .span-6,
+      .span-4 {
+        grid-column: span 12;
+      }
+
+      header {
+        display: grid;
+        grid-template-columns: 44px 1fr;
+        grid-template-areas:
+          "burger hero"
+          "status status";
+        align-items: start;
+        gap: 12px 14px;
+      }
+
+      .menu-toggle {
+        grid-area: burger;
+        align-self: start;
+      }
+
+      .hero {
+        grid-area: hero;
+        min-width: 0;
+      }
+
+      .status-panel {
+        grid-area: status;
+        width: 100%;
+        min-width: 0;
+      }
+
+      .summary-top {
+        flex-direction: column;
+      }
+
+      .summary-stats {
+        grid-template-columns: 1fr;
+      }
+
+      .buttons {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .app {
+        padding: 18px 14px 28px;
+      }
+
+      .card {
+        padding: 16px;
+      }
+
+      .habit-calendar-head,
+      .habit-row {
+        grid-template-columns: 1fr;
+      }
+
+      .habit-streak {
+        text-align: left;
+      }
+
+      .summary-top .buttons {
+        margin-top: 4px;
+      }
+
+      .summary-top .buttons button {
+        flex: 1 1 100%;
+      }
+
+      .objects-toolbar {
+        grid-template-columns: 1fr;
+      }
+
+      .mini-plan-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .time-block {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+  <nav class="mobile-nav" id="mobileNav" aria-hidden="true">
+    <div class="mobile-nav-head">
+      <h2 class="mobile-nav-title">Разделы</h2>
+      <button type="button" class="mobile-nav-close" id="mobileNavClose" aria-label="Закрыть меню">&times;</button>
+    </div>
+    <div class="mobile-nav-links">
+      <a class="mobile-nav-link" href="#section-work">Работа</a>
+      <a class="mobile-nav-link" href="#section-enginepp">EnginePP</a>
+      <a class="mobile-nav-link" href="#section-unity">Unity</a>
+      <a class="mobile-nav-link" href="#section-prayer">Намаз</a>
+      <a class="mobile-nav-link" href="#section-body">Тело</a>
+      <a class="mobile-nav-link" href="#section-brain">Мозг</a>
+      <a class="mobile-nav-link" href="#section-rest">Отдых</a>
+    </div>
+  </nav>
+
+  <div class="app">
+    <header>
+      <button type="button" class="menu-toggle" id="menuToggle" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobileNav">
+        <span class="menu-toggle-icon" aria-hidden="true"></span>
+      </button>
+      <div class="hero">
+        <h1>Daily Navigator</h1>
+        <p class="lead">Один экран для фокуса на день: работа, EnginePP, Unity, намаз, тело, мозг и отдых без хаоса.</p>
+        <div class="pill-row">
+          <a class="pill" href="#section-work">Работа</a>
+          <a class="pill" href="#section-enginepp">EnginePP</a>
+          <a class="pill" href="#section-unity">Unity</a>
+          <a class="pill" href="#section-prayer">Намаз</a>
+          <a class="pill" href="#section-body">Тело</a>
+          <a class="pill" href="#section-brain">Мозг</a>
+          <a class="pill" href="#section-rest">Отдых</a>
+        </div>
+      </div>
+
+      <aside class="status-panel">
+        <div class="date-box">
+          <strong id="today"></strong>
+          <div id="progressText">Прогресс дня: 0%</div>
+          <div id="saveStatus" class="save-status">Автосохранение включено</div>
+        </div>
+      </aside>
+    </header>
+
+    <section class="card span-12 summary-card">
+      <div class="summary-top">
+        <div>
+          <h2>Баланс дня</h2>
+          <p>Закрой главное, не распыляйся и оставь короткий след по каждому важному блоку. Дневной прогресс считается по чекбоксам.</p>
+        </div>
+        <div class="buttons">
+          <button type="button" class="secondary" onclick="startNewDay()">Начать день</button>
+          <button type="button" onclick="saveData(true)">Сохранить</button>
+          <button type="button" class="secondary" onclick="resetDay()">Очистить день</button>
+        </div>
+      </div>
+      <div class="progress-wrap" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+      <div id="minimumDayStatus" class="minimum-day-status">Минимальный день: не закрыт</div>
+      <div class="summary-stats">
+        <div class="stat">
+          <span class="stat-value" id="checksDone">0/0</span>
+          <span class="small">Закрыто привычек и блоков</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="focusFields">0/3</span>
+          <span class="small">Заполнено главных фокуса</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value" id="dayState">Старт</span>
+          <span class="small">Текущий ритм дня</span>
+        </div>
+      </div>
+    </section>
+
+    <main class="grid">
+      <section class="card span-8 focus-card" id="mainFocusCard">
+        <div class="card-head">
+          <h2>Сегодня главное</h2>
+          <span class="section-note small">3 якоря, чтобы не расползтись</span>
+        </div>
+        <div class="focus-hint">Сначала сделай это</div>
+        <div class="tasks">
+          <div class="field">
+            <label id="mainWorkLabel" for="mainWork">Главная задача по работе</label>
+            <input id="mainWork" class="focus-input" data-save="main_work" type="text" placeholder="Например: закрыть ключевой рабочий блок" />
+          </div>
+          <div class="field">
+            <label for="mainEnginepp">Одна задача по EnginePP</label>
+            <input id="mainEnginepp" data-save="main_enginepp" type="text" placeholder="Например: исправить баг или проверить модуль" />
+          </div>
+          <div class="field">
+            <label for="mainUnity">Маленький шаг по Unity</label>
+            <input id="mainUnity" data-save="main_unity" type="text" placeholder="Например: 1 маленькая механика или UI-правка" />
+          </div>
+          <div class="field">
+            <label for="dontTouch">Не трогать сегодня</label>
+            <textarea id="dontTouch" data-save="dont_touch" placeholder="Сюда записывать всё, что отвлекает и не входит в главный маршрут"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <section class="card span-4">
+        <h2>Сон</h2>
+        <div class="field">
+          <label for="sleepHours">Сколько спал?</label>
+          <select id="sleepHours" data-save="sleep_hours">
+            <option value="">Выбрать</option>
+            <option>4 часа</option>
+            <option>5 часов</option>
+            <option>6 часов</option>
+            <option>7 часов</option>
+            <option>Больше 7 часов</option>
+          </select>
+        </div>
+        <div class="row"><input data-check type="checkbox" id="wokeFresh" /><label for="wokeFresh">Проснулся бодрым</label></div>
+      </section>
+
+      <section class="card span-4" id="section-prayer">
+        <h2>Намаз</h2>
+        <div class="row"><input data-check type="checkbox" id="fajr" /><label for="fajr">Фаджр</label></div>
+        <div class="row"><input data-check type="checkbox" id="zuhr" /><label for="zuhr">Зухр</label></div>
+        <div class="row"><input data-check type="checkbox" id="asr" /><label for="asr">Аср</label></div>
+        <div class="row"><input data-check type="checkbox" id="maghrib" /><label for="maghrib">Магриб</label></div>
+        <div class="row"><input data-check type="checkbox" id="isha" /><label for="isha">Иша</label></div>
+        <div class="row"><input data-check type="checkbox" id="tahajjud" /><label for="tahajjud">Тахаджуд, если Аллах дал проснуться</label></div>
+      </section>
+
+      <section class="card span-4" id="section-body">
+        <h2>Тело</h2>
+        <div class="row"><input data-check type="checkbox" id="steps" /><label for="steps">1000 шагов</label></div>
+        <div class="row"><input data-check type="checkbox" id="water" /><label for="water">Вода и нормальная еда</label></div>
+        <div class="mini-plan">
+          <div class="small">План отжиманий на неделю</div>
+          <div class="mini-plan-grid">
+            <div class="mini-plan-item">День 1 — Грудь</div>
+            <div class="mini-plan-item">День 2 — Трицепс</div>
+            <div class="mini-plan-item">День 3 — Плечи</div>
+            <div class="mini-plan-item">День 4 — Грудь / сила</div>
+            <div class="mini-plan-item">День 5 — Трицепс / предплечья</div>
+            <div class="mini-plan-item">День 6 — Плечи / корпус</div>
+            <div class="mini-plan-item">День 7 — отдых</div>
+          </div>
+          <div class="row"><input data-check type="checkbox" id="pushups_training" /><label for="pushups_training">Тренировка отжиманий выполнена</label></div>
+          <div class="row"><input data-check type="checkbox" id="legs_training" /><label for="legs_training">Ноги выполнены</label></div>
+          <div class="row"><input data-check type="checkbox" id="core_training" /><label for="core_training">Пресс / корсет выполнен</label></div>
+          <div id="trainingProgressSummary" class="progress-summary">
+            <div class="progress-summary-note">Прогрессия пока не начата.</div>
+          </div>
+          <div class="small">После тренировки открой Body Library и сохрани результат для авто-прогрессии.</div>
+          <a class="link-button" href="pushups_library.html">Открыть Body Library</a>
+        </div>
+        <div class="field">
+          <label for="bodyNotes">План по телу</label>
+          <textarea id="bodyNotes" data-save="body_notes" placeholder="Сегодня: Body Library. Отметь отжимания / ноги / пресс-корсет по факту выполнения. Спина отдельно закрывается в блоке упражнений для спины."></textarea>
+        </div>
+      </section>
+
+      <section class="card span-4">
+        <h2>Коран / арабский</h2>
+        <div class="row"><input data-check type="checkbox" id="quran" /><label for="quran">Чтение Корана</label></div>
+        <div class="row"><input data-check type="checkbox" id="arabic" /><label for="arabic">Арабский 10-15 минут</label></div>
+        <div class="field">
+          <label for="quranNotes">Что учил или читал</label>
+          <textarea id="quranNotes" data-save="quran_notes" placeholder="Короткая запись по Корану или арабскому"></textarea>
+        </div>
+      </section>
+
+      <section class="card span-6" id="section-work">
+        <h2>Работа</h2>
+        <div class="row"><input data-check type="checkbox" id="work_main" /><label for="work_main">Главный рабочий блок закрыт</label></div>
+        <div class="row"><input data-check type="checkbox" id="work_files" /><label for="work_files">Файлы, переписка и хвосты разобраны</label></div>
+        <div class="field">
+          <label for="workNotes">Заметки по работе</label>
+          <textarea id="workNotes" data-save="work_notes" placeholder="Проекты, чертежи, ВОР, смета, что нужно не потерять"></textarea>
+        </div>
+      </section>
+
+      <section class="card span-6">
+        <div class="card-head">
+          <h2>Рабочие объекты</h2>
+          <span class="section-note small">Список объектов и разделов</span>
+        </div>
+        <div class="objects-toolbar">
+          <input id="objectNameInput" type="text" placeholder="Название объекта" />
+          <button type="button" onclick="addObject()">Добавить объект</button>
+        </div>
+        <div id="objectsList" class="objects-list"></div>
+      </section>
+
+      <section class="card span-6" id="section-enginepp">
+        <h2>EnginePP</h2>
+        <div class="row"><input data-check type="checkbox" id="enginepp_task" /><label for="enginepp_task">Одна задача EnginePP выполнена</label></div>
+        <div class="row"><input data-check type="checkbox" id="enginepp_test" /><label for="enginepp_test">Проверка или тестирование сделаны</label></div>
+        <div class="field">
+          <label for="engineppNotes">Заметки по EnginePP</label>
+          <textarea id="engineppNotes" data-save="enginepp_notes" placeholder="Баг, модуль, промпт, библиотека, важная мысль"></textarea>
+        </div>
+      </section>
+
+      <section class="card span-6" id="section-unity">
+        <h2>Unity game</h2>
+        <div class="row"><input data-check type="checkbox" id="unity_small" /><label for="unity_small">Сделан маленький шаг по Unity</label></div>
+        <div class="row"><input data-check type="checkbox" id="unity_no_overdo" /><label for="unity_no_overdo">Не ушёл в Unity вместо основной работы</label></div>
+        <div class="field">
+          <label for="unityNotes">Заметки по Unity</label>
+          <textarea id="unityNotes" data-save="unity_notes" placeholder="Механика, сцена, UI, баланс, Android build"></textarea>
+        </div>
+      </section>
+
+      <section class="card span-6" id="section-brain">
+        <h2>Мозг / чтение</h2>
+        <div class="row"><input data-check type="checkbox" id="reading" /><label for="reading">Чтение до 30 минут</label></div>
+        <div class="row"><input data-check type="checkbox" id="brain" /><label for="brain">Упражнения для мозга</label></div>
+        <div class="small" id="brainToday">Сегодня для мозга: -</div>
+        <div class="small" id="brainHint">Подсказка: -</div>
+        <div class="row"><input data-check type="checkbox" id="brain_5min" /><label for="brain_5min">Мозг 5 минут выполнен</label></div>
+        <div class="buttons">
+          <button type="button" class="secondary" onclick="startBrainTimer()">Старт 5 минут</button>
+          <button type="button" class="secondary" onclick="resetBrainTimer()">Сброс</button>
+        </div>
+        <div class="small" id="brainTimerDisplay">05:00</div>
+        <div class="field">
+          <label for="brainNotes">Что читал или тренировал</label>
+          <textarea id="brainNotes" data-save="brain_notes" placeholder="Книга, тема или упражнение"></textarea>
+        </div>
+      </section>
+
+      <section class="card span-8">
+        <div class="card-head">
+          <h2>Распорядок</h2>
+          <span class="section-note small">Простой ритм без перегруза</span>
+        </div>
+        <div class="schedule">
+          <div class="time-block"><div class="time">Утро</div><div>Фаджр, план дня, главный рабочий блок до хаоса и отвлечений.</div></div>
+          <div class="time-block"><div class="time">День</div><div>Работа, Зухр, EnginePP, Аср и реальные проектные задачи.</div></div>
+          <div class="time-block"><div class="time">Вечер</div><div>Магриб, тело, маленький шаг по Unity, Коран или арабский, Иша.</div></div>
+          <div class="time-block"><div class="time">Ночь</div><div>Спокойное завершение, итог дня, сон и Тахаджуд, если проснулся.</div></div>
+        </div>
+      </section>
+
+      <section class="card span-4" id="section-rest">
+        <h2>Отдых</h2>
+        <div class="row"><input data-check type="checkbox" id="rest" /><label for="rest">Отдых без чувства вины</label></div>
+        <div class="row"><input data-check type="checkbox" id="no_chaos" /><label for="no_chaos">Не распылялся между 10 задачами</label></div>
+        <div class="field">
+          <label for="restNotes">Что было отдыхом</label>
+          <textarea id="restNotes" data-save="rest_notes" placeholder="Игры, фильм, YouTube или просто тишина"></textarea>
+        </div>
+      </section>
+
+      <section class="card span-12">
+        <div class="card-head">
+          <h2>Упражнения для спины</h2>
+          <span class="section-note small">Мягко, без боли и рывков</span>
+        </div>
+        <div class="small">10-15 минут спокойно. Это не силовая тренировка, а защита поясницы и мягкая стабилизация.</div>
+        <div class="small" id="backTimerDisplay">15:00</div>
+        <div class="buttons">
+          <button type="button" class="secondary" onclick="startBackTimer()">Старт 15 минут</button>
+          <button type="button" class="secondary" onclick="resetBackTimer()">Сброс</button>
+        </div>
+        <div class="row"><input data-check type="checkbox" id="back_10" /><label for="back_10">Комплекс для спины выполнен</label></div>
+        <div class="small">Упражнения</div>
+        <div class="row"><input data-check type="checkbox" id="back_cat" /><label for="back_cat">Кошка-корова, мягкая разминка</label></div>
+        <div class="row"><input data-check type="checkbox" id="back_bird" /><label for="back_bird">Bird-dog, укрепление корпуса</label></div>
+        <div class="row"><input data-check type="checkbox" id="back_bridge" /><label for="back_bridge">Ягодичный мостик без прогиба в пояснице</label></div>
+        <div class="row"><input data-check type="checkbox" id="back_superman" /><label for="back_superman">Супермен поочерёдно: рука и противоположная нога</label></div>
+        <div class="row"><input data-check type="checkbox" id="back_knee" /><label for="back_knee">Колени к груди поочерёдно и мягко</label></div>
+        <div class="field">
+          <label for="backNotes">Самочувствие спины</label>
+          <textarea id="backNotes" data-save="back_notes" placeholder="Нормально, тянет, боль. Если боль усиливается, остановиться."></textarea>
+        </div>
+        <div class="small">Мини-набор: 5-6 упражнений максимум, без перегруза.</div>
+        <div class="small">Правило: без боли, без рывков, без скручиваний. Если боль усиливается - остановиться.</div>
+      </section>
+
+      <section class="card span-4">
+        <div class="card-head">
+          <h2>Недельный обзор</h2>
+          <span class="section-note small">Минимальный день за 7 дней</span>
+        </div>
+        <div id="weeklyOverviewGrid" class="overview-grid"></div>
+        <div id="weeklyOverviewTotal" class="overview-total">Минимальных дней: 0/7</div>
+      </section>
+
+      <section class="card span-8">
+        <div class="card-head">
+          <h2>Календарь привычек</h2>
+          <span class="section-note small">Последние 7 дней и текущая серия</span>
+        </div>
+        <div class="habit-calendar">
+          <div class="habit-calendar-head small">
+            <div>Привычка</div>
+            <div id="habitCalendarDays" class="habit-grid"></div>
+            <div class="habit-streak">Streak</div>
+          </div>
+          <div id="habitCalendarRows"></div>
+        </div>
+      </section>
+
+      <section class="card span-12">
+        <div class="card-head">
+          <h2>Данные</h2>
+          <span class="section-note small">Резервная копия и восстановление</span>
+        </div>
+        <div class="buttons">
+          <button type="button" class="secondary" onclick="exportData()">Экспорт JSON</button>
+          <button type="button" class="secondary" onclick="triggerImportData()">Импорт JSON</button>
+        </div>
+        <input id="importDataInput" type="file" accept=".json,application/json" style="display:none" />
+      </section>
+
+      <section class="card span-12">
+        <h2>Итог дня</h2>
+        <div class="tasks">
+          <div class="field">
+            <label for="dayResult">Что сделал сегодня</label>
+            <textarea id="dayResult" data-save="day_result" placeholder="Короткий честный итог без лишней драмы"></textarea>
+          </div>
+          <div class="field">
+            <label for="tomorrowMain">Главное на завтра</label>
+            <textarea id="tomorrowMain" data-save="tomorrow_main" placeholder="Одна главная цель, с которой начнётся следующий день"></textarea>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    const today = new Date();
+    const dateKey = today.toLocaleDateString("sv-SE");
+    const storageKey = "dailyNavigator_" + dateKey;
+    const workObjectsStorageKey = "dailyNavigator_workObjects";
+
+    const saveStatusEl = document.getElementById("saveStatus");
+    const progressBarEl = document.getElementById("progressBar");
+    const progressTextEl = document.getElementById("progressText");
+    const checksDoneEl = document.getElementById("checksDone");
+    const focusFieldsEl = document.getElementById("focusFields");
+    const dayStateEl = document.getElementById("dayState");
+    const minimumDayStatusEl = document.getElementById("minimumDayStatus");
+    const mainFocusCardEl = document.getElementById("mainFocusCard");
+    const mainWorkInputEl = document.getElementById("mainWork");
+    const mainWorkLabelEl = document.getElementById("mainWorkLabel");
+    const brainTodayEl = document.getElementById("brainToday");
+    const brainHintEl = document.getElementById("brainHint");
+    const brainTimerDisplayEl = document.getElementById("brainTimerDisplay");
+    const brain5minCheckboxEl = document.getElementById("brain_5min");
+    const trainingProgressSummaryEl = document.getElementById("trainingProgressSummary");
+    const workMainCheckboxEl = document.getElementById("work_main");
+    const backTimerDisplayEl = document.getElementById("backTimerDisplay");
+    const back10CheckboxEl = document.getElementById("back_10");
+    const weeklyOverviewGridEl = document.getElementById("weeklyOverviewGrid");
+    const weeklyOverviewTotalEl = document.getElementById("weeklyOverviewTotal");
+    const habitCalendarDaysEl = document.getElementById("habitCalendarDays");
+    const habitCalendarRowsEl = document.getElementById("habitCalendarRows");
+    const importDataInputEl = document.getElementById("importDataInput");
+    const objectNameInputEl = document.getElementById("objectNameInput");
+    const objectsListEl = document.getElementById("objectsList");
+    let workObjects = [];
+    let brainTimerSeconds = 300;
+    let brainTimerInterval = null;
+    let backTimerSeconds = 900;
+    let backTimerInterval = null;
+
+    document.getElementById("today").textContent = today.toLocaleDateString("ru-RU", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+
+    function setSaveStatus(text, isError) {
+      saveStatusEl.textContent = text;
+      saveStatusEl.classList.toggle("error", Boolean(isError));
+    }
+
+    function updateBrainExercise() {
+      const exercises = {
+        0: {
+          title: "отдых для мозга",
+          hint: "Воскресенье: отдых"
+        },
+        1: {
+          title: "Быстрая математика",
+          hint: "Быстрая математика: простые примеры на скорость"
+        },
+        2: {
+          title: "Синхронное письмо двумя руками",
+          hint: "Синхронное письмо: писать двумя руками одновременно"
+        },
+        3: {
+          title: "Обратный счёт в уме",
+          hint: "Обратный счёт: 100 -> 0 по 3 или 7"
+        },
+        4: {
+          title: "Мнемотехника",
+          hint: "Мнемотехника: запомнить 5-10 слов"
+        },
+        5: {
+          title: "Концентрация на точке / дыхании",
+          hint: "Концентрация: точка или дыхание 3-5 минут"
+        },
+        6: {
+          title: "Пересказ текста",
+          hint: "Пересказ: прочитать абзац и пересказать"
+        }
+      };
+
+      const todayExercise = exercises[today.getDay()];
+      brainTodayEl.textContent = "Сегодня для мозга: " + todayExercise.title;
+      brainHintEl.textContent = "Подсказка: " + todayExercise.hint;
+    }
+
+    function updateBrainTimerDisplay() {
+      const minutes = Math.floor(brainTimerSeconds / 60);
+      const seconds = brainTimerSeconds % 60;
+      brainTimerDisplayEl.textContent = String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+    }
+
+    function playTimerDoneSound() {
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+
+        const audioContext = new AudioContextClass();
+        const now = audioContext.currentTime;
+
+        [0, 0.18].forEach((offset) => {
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
+
+          oscillator.type = "sine";
+          oscillator.frequency.setValueAtTime(880, now + offset);
+
+          gainNode.gain.setValueAtTime(0.0001, now + offset);
+          gainNode.gain.exponentialRampToValueAtTime(0.04, now + offset + 0.01);
+          gainNode.gain.exponentialRampToValueAtTime(0.0001, now + offset + 0.12);
+
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
+
+          oscillator.start(now + offset);
+          oscillator.stop(now + offset + 0.12);
+        });
+
+        window.setTimeout(() => {
+          audioContext.close().catch(() => {});
+        }, 500);
+      } catch (error) {
+        // Ignore blocked or unavailable audio without affecting the app.
+      }
+    }
+
+    function startBrainTimer() {
+      if (brainTimerInterval) return;
+
+      brainTimerInterval = window.setInterval(() => {
+        if (brainTimerSeconds > 0) {
+          brainTimerSeconds -= 1;
+          updateBrainTimerDisplay();
+        }
+
+        if (brainTimerSeconds <= 0) {
+          window.clearInterval(brainTimerInterval);
+          brainTimerInterval = null;
+          brainTimerSeconds = 0;
+          updateBrainTimerDisplay();
+          playTimerDoneSound();
+          brain5minCheckboxEl.checked = true;
+          saveData(false);
+        }
+      }, 1000);
+    }
+
+    function resetBrainTimer() {
+      if (brainTimerInterval) {
+        window.clearInterval(brainTimerInterval);
+        brainTimerInterval = null;
+      }
+
+      brainTimerSeconds = 300;
+      updateBrainTimerDisplay();
+    }
+
+    function updateBackTimerDisplay() {
+      const minutes = Math.floor(backTimerSeconds / 60);
+      const seconds = backTimerSeconds % 60;
+      backTimerDisplayEl.textContent = String(minutes).padStart(2, "0") + ":" + String(seconds).padStart(2, "0");
+    }
+
+    function startBackTimer() {
+      if (backTimerInterval) return;
+
+      backTimerInterval = window.setInterval(() => {
+        if (backTimerSeconds > 0) {
+          backTimerSeconds -= 1;
+          updateBackTimerDisplay();
+        }
+
+        if (backTimerSeconds <= 0) {
+          window.clearInterval(backTimerInterval);
+          backTimerInterval = null;
+          backTimerSeconds = 0;
+          updateBackTimerDisplay();
+          playTimerDoneSound();
+          back10CheckboxEl.checked = true;
+          saveData(false);
+          updateProgress();
+        }
+      }, 1000);
+    }
+
+    function resetBackTimer() {
+      if (backTimerInterval) {
+        window.clearInterval(backTimerInterval);
+        backTimerInterval = null;
+      }
+
+      backTimerSeconds = 900;
+      updateBackTimerDisplay();
+    }
+
+    function collectData() {
+      const data = { checks: {}, fields: {}, savedAt: null };
+
+      document.querySelectorAll("[data-check]").forEach((el) => {
+        data.checks[el.id] = el.checked;
+      });
+
+      document.querySelectorAll("[data-save]").forEach((el, index) => {
+        const key = el.getAttribute("data-save") || ("field_" + index);
+        data.fields[key] = el.value;
+      });
+
+      data.savedAt = new Date().toISOString();
+      return data;
+    }
+
+    function saveWorkObjects() {
+      localStorage.setItem(workObjectsStorageKey, JSON.stringify(workObjects));
+    }
+
+    function createSection() {
+      return {
+        title: "",
+        inProgress: false,
+        done: false,
+        note: ""
+      };
+    }
+
+    function addObject() {
+      const name = objectNameInputEl.value.trim();
+      if (!name) return;
+
+      workObjects.push({
+        name: name,
+        sections: []
+      });
+
+      objectNameInputEl.value = "";
+      renderObjects();
+      saveData(false);
+    }
+
+    function addSection(objectIndex) {
+      if (!workObjects[objectIndex]) return;
+
+      workObjects[objectIndex].sections.push(createSection());
+      renderObjects();
+      saveData(false);
+    }
+
+    function renderObjects() {
+      objectsListEl.innerHTML = "";
+
+      if (!workObjects.length) {
+        const emptyState = document.createElement("div");
+        emptyState.className = "small";
+        emptyState.textContent = "Пока нет объектов. Добавь первый объект выше.";
+        objectsListEl.appendChild(emptyState);
+        return;
+      }
+
+      workObjects.forEach((objectItem, objectIndex) => {
+        const objectCard = document.createElement("div");
+        objectCard.className = "card object-card";
+
+        const header = document.createElement("div");
+        header.className = "object-header";
+
+        const title = document.createElement("h3");
+        title.textContent = objectItem.name;
+
+        const actions = document.createElement("div");
+        actions.className = "object-actions";
+
+        const addSectionButton = document.createElement("button");
+        addSectionButton.type = "button";
+        addSectionButton.className = "secondary";
+        addSectionButton.textContent = "Добавить раздел";
+        addSectionButton.addEventListener("click", () => addSection(objectIndex));
+
+        const deleteObjectButton = document.createElement("button");
+        deleteObjectButton.type = "button";
+        deleteObjectButton.className = "secondary";
+        deleteObjectButton.textContent = "Удалить объект";
+        deleteObjectButton.addEventListener("click", () => {
+          workObjects.splice(objectIndex, 1);
+          renderObjects();
+          saveData(false);
+        });
+
+        actions.appendChild(addSectionButton);
+        actions.appendChild(deleteObjectButton);
+        header.appendChild(title);
+        header.appendChild(actions);
+        objectCard.appendChild(header);
+
+        const sectionList = document.createElement("div");
+        sectionList.className = "section-list";
+
+        objectItem.sections.forEach((section, sectionIndex) => {
+          const sectionItem = document.createElement("div");
+          sectionItem.className = "section-item";
+
+          const titleInput = document.createElement("input");
+          titleInput.type = "text";
+          titleInput.placeholder = "Название раздела";
+          titleInput.value = section.title;
+          titleInput.addEventListener("input", (event) => {
+            workObjects[objectIndex].sections[sectionIndex].title = event.target.value;
+          });
+
+          const inProgressRow = document.createElement("div");
+          inProgressRow.className = "row";
+
+          const inProgressCheckbox = document.createElement("input");
+          inProgressCheckbox.type = "checkbox";
+          inProgressCheckbox.checked = section.inProgress;
+          inProgressCheckbox.addEventListener("change", (event) => {
+            workObjects[objectIndex].sections[sectionIndex].inProgress = event.target.checked;
+          });
+
+          const inProgressLabel = document.createElement("label");
+          inProgressLabel.textContent = "В работе";
+
+          inProgressRow.appendChild(inProgressCheckbox);
+          inProgressRow.appendChild(inProgressLabel);
+
+          const doneRow = document.createElement("div");
+          doneRow.className = "row";
+
+          const doneCheckbox = document.createElement("input");
+          doneCheckbox.type = "checkbox";
+          doneCheckbox.checked = section.done;
+          doneCheckbox.addEventListener("change", (event) => {
+            workObjects[objectIndex].sections[sectionIndex].done = event.target.checked;
+          });
+
+          const doneLabel = document.createElement("label");
+          doneLabel.textContent = "Готово";
+
+          doneRow.appendChild(doneCheckbox);
+          doneRow.appendChild(doneLabel);
+
+          const noteInput = document.createElement("textarea");
+          noteInput.placeholder = "Короткая заметка";
+          noteInput.value = section.note;
+          noteInput.addEventListener("input", (event) => {
+            workObjects[objectIndex].sections[sectionIndex].note = event.target.value;
+          });
+
+          const deleteSectionButton = document.createElement("button");
+          deleteSectionButton.type = "button";
+          deleteSectionButton.className = "secondary";
+          deleteSectionButton.textContent = "Удалить раздел";
+          deleteSectionButton.addEventListener("click", () => {
+            workObjects[objectIndex].sections.splice(sectionIndex, 1);
+            renderObjects();
+            saveData(false);
+          });
+
+          sectionItem.appendChild(titleInput);
+          sectionItem.appendChild(inProgressRow);
+          sectionItem.appendChild(doneRow);
+          sectionItem.appendChild(noteInput);
+          sectionItem.appendChild(deleteSectionButton);
+          sectionList.appendChild(sectionItem);
+        });
+
+        objectCard.appendChild(sectionList);
+        objectsListEl.appendChild(objectCard);
+      });
+    }
+
+    function formatSavedTime(isoString) {
+      if (!isoString) return "Автосохранение включено";
+
+      const date = new Date(isoString);
+      if (Number.isNaN(date.getTime())) return "Автосохранение включено";
+
+      return "Сохранено в " + date.toLocaleTimeString("ru-RU", {
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function saveData(showManualMessage) {
+      try {
+        const data = collectData();
+        localStorage.setItem(storageKey, JSON.stringify(data));
+        saveWorkObjects();
+        updateProgress();
+        setSaveStatus(showManualMessage ? "Сохранено вручную" : formatSavedTime(data.savedAt), false);
+      } catch (error) {
+        setSaveStatus("Не удалось сохранить данные в браузере", true);
+      }
+    }
+
+    function loadData() {
+      try {
+        const objectsRaw = localStorage.getItem(workObjectsStorageKey);
+        workObjects = objectsRaw ? JSON.parse(objectsRaw) : [];
+        if (!Array.isArray(workObjects)) {
+          workObjects = [];
+        }
+
+        document.querySelectorAll("[data-check]").forEach((el) => {
+          el.checked = false;
+        });
+
+        document.querySelectorAll("[data-save]").forEach((el) => {
+          el.value = "";
+        });
+
+        const raw = localStorage.getItem(storageKey);
+        if (!raw) {
+          renderObjects();
+          updateMinimumDay();
+          updateWeeklyOverview();
+          updateHabitCalendar();
+          updateTrainingProgressSummary();
+          return;
+        }
+
+        const data = JSON.parse(raw);
+
+        document.querySelectorAll("[data-check]").forEach((el) => {
+          if (data.checks && Object.prototype.hasOwnProperty.call(data.checks, el.id)) {
+            el.checked = Boolean(data.checks[el.id]);
+          }
+        });
+
+        document.querySelectorAll("[data-save]").forEach((el, index) => {
+          const key = el.getAttribute("data-save") || ("field_" + index);
+          if (data.fields && Object.prototype.hasOwnProperty.call(data.fields, key)) {
+            el.value = data.fields[key];
+          }
+        });
+
+        renderObjects();
+        updateMinimumDay();
+        updateWeeklyOverview();
+        updateHabitCalendar();
+        updateTrainingProgressSummary();
+        setSaveStatus(formatSavedTime(data.savedAt), false);
+      } catch (error) {
+        setSaveStatus("Сохранение за сегодня повреждено, можно заполнить заново", true);
+        renderObjects();
+        updateMinimumDay();
+        updateWeeklyOverview();
+        updateHabitCalendar();
+        updateTrainingProgressSummary();
+      }
+    }
+
+    function updateRowStates() {
+      document.querySelectorAll(".row").forEach((row) => {
+        const checkbox = row.querySelector('input[type="checkbox"]');
+        row.classList.toggle("is-done", checkbox ? checkbox.checked : false);
+      });
+    }
+
+    function updateMinimumDay() {
+      const requiredIds = ["fajr", "zuhr", "asr", "maghrib", "isha", "work_main", "back_10"];
+      const isClosed = requiredIds.every((id) => {
+        const checkbox = document.getElementById(id);
+        return checkbox ? checkbox.checked : false;
+      });
+
+      minimumDayStatusEl.textContent = isClosed
+        ? "Минимальный день: закрыт"
+        : "Минимальный день: не закрыт";
+      minimumDayStatusEl.classList.toggle("is-closed", isClosed);
+    }
+
+    function updateMainFocus() {
+      const hasMainTask = Boolean(mainWorkInputEl.value.trim());
+      const isWorkDone = workMainCheckboxEl.checked;
+
+      mainFocusCardEl.classList.toggle("is-active", hasMainTask && !isWorkDone);
+      mainFocusCardEl.classList.toggle("is-done", isWorkDone);
+      mainWorkInputEl.classList.toggle("is-empty", !hasMainTask);
+      mainWorkLabelEl.classList.toggle("is-done", isWorkDone);
+    }
+
+    function updateTrainingProgressSummary() {
+      try {
+        const raw = localStorage.getItem("dailyNavigator_trainingProgress");
+        if (!raw) {
+          trainingProgressSummaryEl.innerHTML = '<div class="progress-summary-note">Прогрессия пока не начата.</div>';
+          return;
+        }
+
+        const progress = JSON.parse(raw);
+        const pushupsLevel = progress.pushups && progress.pushups.level ? progress.pushups.level : 1;
+        const legsLevel = progress.legs && progress.legs.level ? progress.legs.level : 1;
+        const coreLevel = progress.core && progress.core.level ? progress.core.level : 1;
+        const items = [progress.pushups, progress.legs, progress.core];
+        let latestRecommendation = "";
+        let latestTimestamp = 0;
+
+        items.forEach((item) => {
+          if (!item || !item.lastResult || !item.lastResult.savedAt || !item.recommendation) return;
+
+          const savedAt = new Date(item.lastResult.savedAt).getTime();
+          if (savedAt > latestTimestamp) {
+            latestTimestamp = savedAt;
+            latestRecommendation = item.recommendation;
+          }
+        });
+
+        trainingProgressSummaryEl.innerHTML = ""
+          + '<div class="progress-summary-line">Отжимания: уровень ' + pushupsLevel + "</div>"
+          + '<div class="progress-summary-line">Ноги: уровень ' + legsLevel + "</div>"
+          + '<div class="progress-summary-line">Пресс / корсет: уровень ' + coreLevel + "</div>"
+          + '<div class="progress-summary-note">' + (latestRecommendation || "Рекомендация появится после первой сохранённой тренировки.") + "</div>";
+      } catch (error) {
+        trainingProgressSummaryEl.innerHTML = '<div class="progress-summary-note">Прогрессия пока не начата.</div>';
+      }
+    }
+
+    function getMinimumDayStatus(targetDateKey) {
+      const targetStorageKey = "dailyNavigator_" + targetDateKey;
+      const raw = localStorage.getItem(targetStorageKey);
+
+      if (!raw) return false;
+
+      try {
+        const data = JSON.parse(raw);
+        const checks = data.checks || {};
+        return ["fajr", "zuhr", "asr", "maghrib", "isha", "work_main", "back_10"]
+          .every((id) => Boolean(checks[id]));
+      } catch (error) {
+        return false;
+      }
+    }
+
+    function updateWeeklyOverview() {
+      let closedDays = 0;
+      weeklyOverviewGridEl.innerHTML = "";
+
+      for (let offset = 6; offset >= 0; offset -= 1) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - offset);
+        const targetDateKey = date.toLocaleDateString("sv-SE");
+        const isClosed = getMinimumDayStatus(targetDateKey);
+
+        if (isClosed) {
+          closedDays += 1;
+        }
+
+        const cell = document.createElement("div");
+        cell.className = "overview-cell";
+        if (isClosed) {
+          cell.classList.add("is-closed");
+        }
+
+        cell.innerHTML = date.toLocaleDateString("ru-RU", { weekday: "short" }).slice(0, 2)
+          + "<br>"
+          + (isClosed ? "закрыт" : "нет");
+        weeklyOverviewGridEl.appendChild(cell);
+      }
+
+      weeklyOverviewTotalEl.textContent = "Минимальных дней: " + closedDays + "/7";
+    }
+
+    function getDailyHabitStatus(targetDateKey) {
+      const targetStorageKey = "dailyNavigator_" + targetDateKey;
+      const raw = localStorage.getItem(targetStorageKey);
+
+      if (!raw) {
+        return {
+          namaz: false,
+          back: false,
+          brain5: false,
+          quranArabic: false,
+          steps: false,
+          enginepp: false
+        };
+      }
+
+      try {
+        const data = JSON.parse(raw);
+        const checks = data.checks || {};
+
+        return {
+          namaz: ["fajr", "zuhr", "asr", "maghrib", "isha"].every((id) => Boolean(checks[id])),
+          back: Boolean(checks.back_10),
+          brain5: Boolean(checks.brain_5min || checks.brain_5_done),
+          quranArabic: Boolean(checks.quran || checks.arabic),
+          steps: Boolean(checks.steps),
+          enginepp: Boolean(checks.enginepp_task)
+        };
+      } catch (error) {
+        return {
+          namaz: false,
+          back: false,
+          brain5: false,
+          quranArabic: false,
+          steps: false,
+          enginepp: false
+        };
+      }
+    }
+
+    function calculateStreak(habitId) {
+      let streak = 0;
+
+      for (let offset = 0; offset < 365; offset += 1) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - offset);
+        const targetDateKey = date.toLocaleDateString("sv-SE");
+        const status = getDailyHabitStatus(targetDateKey);
+
+        if (!status[habitId]) {
+          break;
+        }
+
+        streak += 1;
+      }
+
+      return streak;
+    }
+
+    function updateHabitCalendar() {
+      const habits = [
+        { id: "namaz", label: "Намаз" },
+        { id: "back", label: "Спина" },
+        { id: "brain5", label: "Мозг 5 минут" },
+        { id: "quranArabic", label: "Коран / арабский" },
+        { id: "steps", label: "1000 шагов" },
+        { id: "enginepp", label: "EnginePP" }
+      ];
+
+      const lastSevenDays = [];
+      for (let offset = 6; offset >= 0; offset -= 1) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - offset);
+        lastSevenDays.push({
+          key: date.toLocaleDateString("sv-SE"),
+          label: date.toLocaleDateString("ru-RU", { weekday: "short" }).slice(0, 2)
+        });
+      }
+
+      habitCalendarDaysEl.innerHTML = "";
+      lastSevenDays.forEach((day) => {
+        const dayCell = document.createElement("div");
+        dayCell.className = "habit-cell";
+        dayCell.textContent = day.label;
+        habitCalendarDaysEl.appendChild(dayCell);
+      });
+
+      habitCalendarRowsEl.innerHTML = "";
+      habits.forEach((habit) => {
+        const row = document.createElement("div");
+        row.className = "habit-row";
+
+        const label = document.createElement("div");
+        label.textContent = habit.label;
+
+        const grid = document.createElement("div");
+        grid.className = "habit-grid";
+
+        lastSevenDays.forEach((day) => {
+          const dayStatus = getDailyHabitStatus(day.key);
+          const cell = document.createElement("div");
+          cell.className = "habit-cell";
+          if (dayStatus[habit.id]) {
+            cell.classList.add("is-active");
+          }
+          grid.appendChild(cell);
+        });
+
+        const streak = document.createElement("div");
+        streak.className = "habit-streak";
+        streak.textContent = "streak: " + calculateStreak(habit.id);
+
+        row.appendChild(label);
+        row.appendChild(grid);
+        row.appendChild(streak);
+        habitCalendarRowsEl.appendChild(row);
+      });
+    }
+
+    function exportData() {
+      const exportDataObject = {};
+
+      for (let index = 0; index < localStorage.length; index += 1) {
+        const key = localStorage.key(index);
+        if (key && key.startsWith("dailyNavigator_")) {
+          exportDataObject[key] = localStorage.getItem(key);
+        }
+      }
+
+      const json = JSON.stringify(exportDataObject, null, 2);
+      const blob = new Blob([json], { type: "application/json" });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "daily_navigator_backup_" + dateKey + ".json";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    }
+
+    function triggerImportData() {
+      importDataInputEl.click();
+    }
+
+    function importData(event) {
+      const file = event.target.files && event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const parsedData = JSON.parse(reader.result);
+
+          Object.keys(parsedData).forEach((key) => {
+            if (key.startsWith("dailyNavigator_")) {
+              localStorage.setItem(key, parsedData[key]);
+            }
+          });
+
+          loadData();
+          updateProgress();
+          updateWeeklyOverview();
+          updateHabitCalendar();
+          window.alert("Данные импортированы");
+        } catch (error) {
+          window.alert("Не удалось импортировать данные");
+        } finally {
+          importDataInputEl.value = "";
+        }
+      };
+
+      reader.readAsText(file);
+    }
+
+    function updateProgress() {
+      const checks = Array.from(document.querySelectorAll("[data-check]"));
+      const done = checks.filter((checkbox) => checkbox.checked).length;
+      const total = checks.length;
+      const percent = total ? Math.round((done / total) * 100) : 0;
+
+      const mainFocusKeys = ["main_work", "main_enginepp", "main_unity"];
+      const filledFocusCount = mainFocusKeys.filter((key) => {
+        const field = document.querySelector('[data-save="' + key + '"]');
+        return field && field.value.trim();
+      }).length;
+
+      let dayState = "Старт";
+      if (percent >= 80) {
+        dayState = "Сильный день";
+      } else if (percent >= 50) {
+        dayState = "Хороший темп";
+      } else if (percent >= 25) {
+        dayState = "День в движении";
+      }
+
+      progressBarEl.style.width = percent + "%";
+      progressTextEl.textContent = "Прогресс дня: " + done + "/" + total + " • " + percent + "%";
+      checksDoneEl.textContent = done + "/" + total;
+      focusFieldsEl.textContent = filledFocusCount + "/3";
+      dayStateEl.textContent = dayState;
+
+      updateMainFocus();
+      updateMinimumDay();
+      updateWeeklyOverview();
+      updateHabitCalendar();
+      updateTrainingProgressSummary();
+      updateRowStates();
+    }
+
+    function resetDay() {
+      if (!window.confirm("Очистить текущий день?")) return;
+
+      try {
+        localStorage.removeItem(storageKey);
+      } catch (error) {
+        setSaveStatus("Не удалось очистить данные в браузере", true);
+      }
+
+      document.querySelectorAll("[data-check]").forEach((el) => {
+        el.checked = false;
+      });
+
+      document.querySelectorAll("[data-save]").forEach((el) => {
+        el.value = "";
+      });
+
+      if (brainTimerInterval) {
+        window.clearInterval(brainTimerInterval);
+        brainTimerInterval = null;
+      }
+
+      if (backTimerInterval) {
+        window.clearInterval(backTimerInterval);
+        backTimerInterval = null;
+      }
+
+      brainTimerSeconds = 300;
+      backTimerSeconds = 900;
+      updateBrainTimerDisplay();
+      updateBackTimerDisplay();
+
+      updateProgress();
+      setSaveStatus("День очищен", false);
+    }
+
+    function startNewDay() {
+      if (!window.confirm("Начать новый день? Чекбоксы будут сброшены")) return;
+
+      document.querySelectorAll("[data-check]").forEach((el) => {
+        el.checked = false;
+      });
+
+      if (brainTimerInterval) {
+        window.clearInterval(brainTimerInterval);
+        brainTimerInterval = null;
+      }
+
+      if (backTimerInterval) {
+        window.clearInterval(backTimerInterval);
+        backTimerInterval = null;
+      }
+
+      brainTimerSeconds = 300;
+      backTimerSeconds = 900;
+      updateBrainTimerDisplay();
+      updateBackTimerDisplay();
+
+      updateProgress();
+      updateMinimumDay();
+      updateHabitCalendar();
+      saveData(false);
+    }
+
+    document.addEventListener("input", () => saveData(false));
+    document.addEventListener("change", () => saveData(false));
+    objectNameInputEl.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        addObject();
+      }
+    });
+    importDataInputEl.addEventListener("change", importData);
+
+    loadData();
+    updateBrainExercise();
+    updateBrainTimerDisplay();
+    updateBackTimerDisplay();
+    renderObjects();
+    updateProgress();
+
+    (function initMobileNav() {
+      const menuToggle = document.getElementById("menuToggle");
+      const mobileNav = document.getElementById("mobileNav");
+      const mobileNavOverlay = document.getElementById("mobileNavOverlay");
+      const mobileNavClose = document.getElementById("mobileNavClose");
+      const mobileMedia = window.matchMedia("(max-width: 900px)");
+
+      if (!menuToggle || !mobileNav || !mobileNavOverlay) return;
+
+      function openMenu() {
+        if (!mobileMedia.matches) return;
+        mobileNav.classList.add("is-open");
+        mobileNavOverlay.classList.add("is-open");
+        document.body.classList.add("menu-open");
+        menuToggle.setAttribute("aria-expanded", "true");
+        mobileNav.setAttribute("aria-hidden", "false");
+      }
+
+      function closeMenu() {
+        mobileNav.classList.remove("is-open");
+        mobileNavOverlay.classList.remove("is-open");
+        document.body.classList.remove("menu-open");
+        menuToggle.setAttribute("aria-expanded", "false");
+        mobileNav.setAttribute("aria-hidden", "true");
+      }
+
+      function handleViewportChange() {
+        if (!mobileMedia.matches) closeMenu();
+      }
+
+      menuToggle.addEventListener("click", () => {
+        if (mobileNav.classList.contains("is-open")) {
+          closeMenu();
+        } else {
+          openMenu();
+        }
+      });
+
+      mobileNavClose.addEventListener("click", closeMenu);
+      mobileNavOverlay.addEventListener("click", closeMenu);
+
+      mobileNav.querySelectorAll('a[href^="#"]').forEach((link) => {
+        link.addEventListener("click", closeMenu);
+      });
+
+      document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") closeMenu();
+      });
+
+      if (typeof mobileMedia.addEventListener === "function") {
+        mobileMedia.addEventListener("change", handleViewportChange);
+      } else if (typeof mobileMedia.addListener === "function") {
+        mobileMedia.addListener(handleViewportChange);
+      }
+    })();
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>

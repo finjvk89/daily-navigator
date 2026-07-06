@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#0c1220" />
+  <link rel="manifest" href="manifest.json" />
+  <title>Body Library</title>
+  <style>
+    :root {
+      --bg: #0c1220;
+      --panel: rgba(15, 22, 40, 0.88);
+      --panel-strong: rgba(20, 31, 55, 0.95);
+      --text: #eef4ff;
+      --muted: #b2c0db;
+      --accent: #6ee7b7;
+      --accent-2: #7cc7ff;
+      --good: #86efac;
+      --warn: #facc15;
+      --danger: #fb7185;
+      --border: rgba(160, 177, 211, 0.16);
+      --shadow: 0 18px 40px rgba(0, 0, 0, 0.28);
+      --card-radius: 22px;
+      --card-padding: 18px;
+      --control-height: 46px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Segoe UI", "Trebuchet MS", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(124, 199, 255, 0.18), transparent 32%),
+        radial-gradient(circle at top right, rgba(110, 231, 183, 0.12), transparent 28%),
+        linear-gradient(180deg, #0b1020 0%, #0d1424 42%, #09111d 100%);
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.65), transparent 90%);
+    }
+
+    .app {
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 28px 20px 40px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero,
+    .card,
+    .progression-form,
+    .progression-summary {
+      background: linear-gradient(180deg, var(--panel), var(--panel-strong));
+      border: 1px solid var(--border);
+      border-radius: var(--card-radius);
+      padding: var(--card-padding);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+    }
+
+    .hero { margin-bottom: 18px; }
+
+    .back-link,
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: var(--control-height);
+      padding: 10px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .back-link { margin-bottom: 16px; }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(30px, 4vw, 42px);
+      line-height: 1;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 24px;
+      line-height: 1.15;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 17px;
+      line-height: 1.25;
+    }
+
+    p,
+    li {
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    .lead {
+      margin: 0;
+      max-width: 74ch;
+      color: var(--muted);
+    }
+
+    .warning {
+      margin-top: 16px;
+      padding: 14px 16px;
+      border-radius: 16px;
+      background: rgba(250, 204, 21, 0.08);
+      border: 1px solid rgba(250, 204, 21, 0.16);
+      color: #f2e2bf;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    .top-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .progression-layout {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .progression-form-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    select,
+    button {
+      min-height: var(--control-height);
+      border-radius: 14px;
+      font-size: 14px;
+    }
+
+    select {
+      width: 100%;
+      padding: 11px 12px;
+      background: rgba(4, 10, 22, 0.45);
+      color: var(--text);
+      border: 1px solid var(--border);
+      outline: none;
+    }
+
+    select:focus {
+      border-color: rgba(124, 199, 255, 0.45);
+      box-shadow: 0 0 0 3px rgba(124, 199, 255, 0.12);
+      background: rgba(4, 10, 22, 0.62);
+    }
+
+    button {
+      border: 0;
+      padding: 11px 15px;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), #4fd1c5);
+      color: #04231b;
+      font-weight: 700;
+      box-shadow: 0 10px 20px rgba(78, 209, 197, 0.22);
+    }
+
+    button.secondary {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+      border: 1px solid var(--border);
+      box-shadow: none;
+    }
+
+    .progression-alert {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .progression-alert.is-danger {
+      background: rgba(251, 113, 133, 0.1);
+      border-color: rgba(251, 113, 133, 0.25);
+      color: #ffd6dd;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+    }
+
+    .summary-card {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: grid;
+      gap: 10px;
+    }
+
+    .summary-card.is-level-up {
+      border-color: rgba(134, 239, 172, 0.28);
+      background: rgba(134, 239, 172, 0.1);
+    }
+
+    .summary-card.is-danger {
+      border-color: rgba(251, 113, 133, 0.28);
+      background: rgba(251, 113, 133, 0.08);
+    }
+
+    .summary-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: baseline;
+    }
+
+    .summary-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .summary-level {
+      color: var(--accent-2);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .library {
+      display: grid;
+      gap: 16px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-note {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .section-description {
+      margin: 0 0 14px;
+      max-width: 88ch;
+      color: var(--muted);
+    }
+
+    .exercise-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .exercise-card {
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      display: grid;
+      gap: 10px;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(110, 231, 183, 0.1);
+      color: var(--accent);
+      font-size: 13px;
+      border: 1px solid rgba(110, 231, 183, 0.16);
+    }
+
+    .pill.alt {
+      background: rgba(124, 199, 255, 0.1);
+      color: var(--accent-2);
+      border-color: rgba(124, 199, 255, 0.16);
+    }
+
+    .exercise-media {
+      position: relative;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border-radius: 16px;
+      width: 100%;
+      background:
+        linear-gradient(135deg, rgba(124, 199, 255, 0.12), rgba(110, 231, 183, 0.08)),
+        rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .exercise-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .exercise-media-placeholder {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 16px;
+      color: var(--muted);
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .exercise-media.is-missing .exercise-media-placeholder {
+      display: flex;
+    }
+
+    .exercise-media.is-missing img {
+      display: none;
+    }
+
+    .detail-block {
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .detail-block strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .recommendation {
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .accordion-item {
+      display: grid;
+      gap: 10px;
+    }
+
+    .accordion-button {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      box-shadow: none;
+    }
+
+    .accordion-button strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    .accordion-button span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .accordion-marker {
+      color: var(--accent-2);
+      font-size: 18px;
+      line-height: 1;
+      padding-top: 2px;
+    }
+
+    .accordion-panel {
+      display: none;
+    }
+
+    .accordion-item.is-open .accordion-panel {
+      display: block;
+    }
+
+    .accordion-item.is-open > .accordion-button {
+      border-color: rgba(124, 199, 255, 0.25);
+      background: rgba(124, 199, 255, 0.08);
+    }
+
+    .accordion-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .anchor-section {
+      scroll-margin-top: 18px;
+    }
+
+    @media (max-width: 960px) {
+      .progression-layout,
+      .exercise-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .app {
+        padding: 18px 14px 28px;
+      }
+
+      .hero,
+      .card,
+      .progression-form,
+      .progression-summary {
+        padding: 16px;
+      }
+
+      .section-head {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <a class="back-link" href="daily_navigator.html">&larr; Назад в Daily Navigator</a>
+
+    <section class="hero">
+      <h1>Body Library</h1>
+      <p class="lead">Ежедневная база для спины и пресса плюс 6-дневный домашний цикл. Цель — не просто нагрузка, а сильное и устойчивое тело без лишнего риска для поясницы.</p>
+      <div class="warning">Правило спины: без боли, без рывков, без взрывных движений. Поясница не провисает. Все упражнения делаются с контролем активной и пассивной фазы.</div>
+      <nav class="top-nav">
+        <a class="nav-link" href="#section-base">Ежедневная база</a>
+        <a class="nav-link" href="#section-day-1">День 1 (A)</a>
+        <a class="nav-link" href="#section-day-2">День 2 (B)</a>
+        <a class="nav-link" href="#section-day-3">День 3 (A)</a>
+        <a class="nav-link" href="#section-day-4">День 4 (B)</a>
+        <a class="nav-link" href="#section-day-5">День 5 (C)</a>
+        <a class="nav-link" href="#section-day-6">День 6 (C)</a>
+      </nav>
+      <div class="top-nav">
+        <button type="button" class="secondary" onclick="collapseAll()">Свернуть всё</button>
+        <button type="button" class="secondary" onclick="openCycleDay(((new Date().getDay() + 5) % 6) + 1)">Раскрыть только сегодняшний день</button>
+      </div>
+    </section>
+
+    <section class="progression-layout">
+      <div class="progression-form">
+        <div class="section-head">
+          <h2>Прогрессия тренировки</h2>
+          <div class="section-note">Без спешки, с чистой техникой</div>
+        </div>
+        <div class="progression-form-grid">
+          <div class="field">
+            <label for="trainingType">Тип тренировки</label>
+            <select id="trainingType">
+              <option value="base">База: спина + пресс</option>
+              <option value="chest">Грудь</option>
+              <option value="legs">Ноги</option>
+              <option value="shoulders">Плечи</option>
+              <option value="triceps">Трицепс</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="techniqueRating">Оценка техники</label>
+            <select id="techniqueRating">
+              <option value="clean">Чисто</option>
+              <option value="medium">Средне</option>
+              <option value="bad">Плохо</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="backFeeling">Самочувствие поясницы</label>
+            <select id="backFeeling">
+              <option value="normal">Нормально</option>
+              <option value="discomfort">Лёгкий дискомфорт</option>
+              <option value="pain">Боль</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="difficultyRating">Сложность</label>
+            <select id="difficultyRating">
+              <option value="easy">Легко</option>
+              <option value="normal">Нормально</option>
+              <option value="hard">Тяжело</option>
+            </select>
+          </div>
+          <button type="button" onclick="saveTrainingResult()">Сохранить результат тренировки</button>
+          <button type="button" class="secondary" onclick="resetTrainingProgress()">Сбросить прогрессию</button>
+        </div>
+        <div id="progressionAlert" class="progression-alert">Спина и пресс выполняются каждый день. Сохраняй результат только после честной оценки техники и поясницы.</div>
+      </div>
+
+      <div class="progression-summary">
+        <div class="section-head">
+          <h2>Текущий прогресс</h2>
+          <div class="section-note">Уровни 1-5</div>
+        </div>
+        <div id="progressSummary" class="summary-grid"></div>
+      </div>
+    </section>
+
+    <main class="library" id="libraryRoot"></main>
+  </div>
+
+  <script>
+    const trainingProgressKey = "dailyNavigator_trainingProgress";
+    const trainingTypeEl = document.getElementById("trainingType");
+    const techniqueRatingEl = document.getElementById("techniqueRating");
+    const backFeelingEl = document.getElementById("backFeeling");
+    const difficultyRatingEl = document.getElementById("difficultyRating");
+    const progressionAlertEl = document.getElementById("progressionAlert");
+    const progressSummaryEl = document.getElementById("progressSummary");
+
+    const exercises = {
+      catCow: {
+        title: "Cat-cow",
+        muscles: "мягкая мобилизация позвоночника",
+        sets: "2×8-12",
+        image: "assets/body/cat-cow.jpg",
+        how: "Встань на четвереньки. Медленно округляй и мягко выпрямляй спину.",
+        passive: "Движение назад делать спокойно, без провала.",
+        active: "Мягко меняй положение позвоночника без рывков.",
+        control: "Не делать глубокий болезненный прогиб. Это разминка, не силовое упражнение.",
+        feeling: "Лёгкое расслабление и подвижность, без боли."
+      },
+      birdDog: {
+        title: "Bird-dog",
+        muscles: "стабилизаторы спины, ягодицы, корпус",
+        sets: "3×8-12 на сторону",
+        image: "assets/body/bird-dog.jpg",
+        how: "Встань на четвереньки. Одновременно вытяни правую руку и левую ногу. Потом поменяй сторону.",
+        passive: "Медленно верни руку и ногу назад, не раскачивая корпус.",
+        active: "Вытяни руку и противоположную ногу, удержи 1 секунду.",
+        control: "Таз не разворачивать. Поясницу не прогибать. Движение медленное.",
+        feeling: "Должна чувствоваться стабильная работа корпуса и ягодицы, не боль в пояснице."
+      },
+      deadBug: {
+        title: "Dead bug",
+        muscles: "глубокий пресс, стабилизация поясницы",
+        sets: "3×8-12 на сторону",
+        image: "assets/body/dead-bug.jpg",
+        how: "Ляг на спину. Руки вверх, ноги согнуты. Медленно опускай противоположную руку и ногу.",
+        passive: "Рука и нога уходят вниз медленно, поясница остаётся прижатой к полу.",
+        active: "Верни руку и ногу обратно за счёт пресса.",
+        control: "Если поясница отрывается от пола — уменьши амплитуду.",
+        feeling: "Работает глубокий пресс, поясница не должна напрягаться."
+      },
+      gluteBridge: {
+        title: "Ягодичный мостик",
+        muscles: "ягодицы, задняя поверхность бедра, стабилизация таза",
+        sets: "3×12-20",
+        image: "assets/body/glute-bridge.jpg",
+        how: "Ляг на спину, ноги согнуты, стопы на полу. Подними таз вверх.",
+        passive: "Опускай таз вниз медленно, не бросай его на пол.",
+        active: "Подними таз вверх за счёт ягодиц, а не за счёт прогиба поясницы.",
+        control: "В верхней точке не переразгибай поясницу. Рёбра не выпячивать.",
+        feeling: "Главное ощущение — ягодицы. Если чувствуешь поясницу, уменьши амплитуду."
+      },
+      plank: {
+        title: "Планка на локтях",
+        muscles: "пресс, корпус, плечи, стабилизация позвоночника",
+        sets: "3×20-45 секунд",
+        image: "assets/body/forearm-plank.jpg",
+        how: "Локти под плечами. Тело прямое от головы до пяток.",
+        passive: "Фазы вниз нет, это статическое упражнение.",
+        active: "Держи живот подтянутым, ягодицы слегка напряжены.",
+        control: "Поясница не провисает. Если провисает — остановись.",
+        feeling: "Должен работать пресс, не поясница."
+      },
+      sidePlank: {
+        title: "Боковая планка с колен",
+        muscles: "боковой пресс, стабилизаторы таза, плечи",
+        sets: "3×15-30 секунд на сторону",
+        image: "assets/body/side-plank-knees.jpg",
+        how: "Ляг на бок, опора на локоть и колени. Подними таз.",
+        passive: "Фазы вниз нет, это удержание.",
+        active: "Удерживай таз поднятым, корпус прямой.",
+        control: "Не заваливайся вперёд или назад. Плечо не зажимать.",
+        feeling: "Должна работать боковая часть корпуса."
+      },
+      hollowHold: {
+        title: "Hollow hold облегчённый",
+        muscles: "пресс, глубокий корпус",
+        sets: "3×10-25 секунд",
+        image: "assets/body/modified-hollow-hold.jpg",
+        how: "Ляг на спину. Поясница прижата. Ноги можно держать согнутыми, руки вдоль тела или вверх.",
+        passive: "Фазы вниз нет, это удержание.",
+        active: "Удерживай пресс напряжённым и не давай пояснице отрываться от пола.",
+        control: "Если поясница отрывается — согни ноги сильнее или прекрати подход.",
+        feeling: "Должен гореть пресс, не поясница."
+      },
+      classicPushup: {
+        title: "Классические отжимания",
+        muscles: "грудь, трицепс, передняя дельта, корпус",
+        sets: "2×10-15 как разогрев",
+        image: "assets/pushups/classic-pushup.jpg",
+        how: "Поставь руки примерно на ширине плеч. Тело держи одной прямой линией от головы до пяток. Живот слегка подтянут, ягодицы напряжены.",
+        passive: "Опускайся вниз спокойно 2-3 секунды. Грудь идёт к полу, локти идут примерно под углом 30-45 градусов от корпуса.",
+        active: "Выжимай себя вверх без рывка. В верхней точке не расслабляй живот и не проваливай поясницу.",
+        control: "Если поясница провисает — остановись или делай вариант с руками на возвышении.",
+        feeling: "Должны работать грудь, трицепс и корпус, а не поясница."
+      },
+      widePushup: {
+        title: "Широкие отжимания",
+        muscles: "грудь, передняя дельта",
+        sets: "3×8-15",
+        image: "assets/pushups/wide-pushup.jpg",
+        how: "Поставь руки шире плеч. Корпус ровный. Не разворачивай локти слишком сильно в стороны.",
+        passive: "Опускайся медленно. Внизу почувствуй растяжение грудных мышц.",
+        active: "Поднимайся вверх, как будто хочешь свести грудь к центру.",
+        control: "Не падай вниз резко. Не прогибайся в пояснице ради глубины.",
+        feeling: "Главное ощущение — грудные мышцы и передняя часть плеча."
+      },
+      slowPushup: {
+        title: "Медленные отжимания",
+        muscles: "грудь, трицепс, корпус",
+        sets: "3×6-10",
+        image: "assets/pushups/slow-pushup.jpg",
+        how: "Это обычные отжимания, но весь смысл в темпе.",
+        passive: "Опускайся 3 секунды. Держи корпус жёстким.",
+        active: "Поднимайся за 1-2 секунды, без рывка.",
+        control: "Лучше сделать 6 чистых повторов, чем 15 кривых.",
+        feeling: "Чувствуется вся передняя цепь, особенно грудь и пресс."
+      },
+      closeGripPushup: {
+        title: "Узкие отжимания",
+        muscles: "трицепс, грудь, передняя дельта",
+        sets: "3×8-12",
+        image: "assets/pushups/close-grip-pushup.jpg",
+        how: "Поставь руки немного уже ширины плеч. Ладони не обязательно соединять. Локти направляй назад вдоль корпуса.",
+        passive: "Опускайся медленно, локти скользят рядом с телом. Почувствуй растяжение трицепса.",
+        active: "Выжимай себя вверх за счёт трицепса, будто отталкиваешь пол назад.",
+        control: "Если локти расходятся в стороны — нагрузка уходит с трицепса и техника ломается.",
+        feeling: "Основное ощущение — трицепс, грудь работает вспомогательно."
+      },
+      diamondPushup: {
+        title: "Алмазные отжимания",
+        muscles: "трицепс, внутренняя часть груди",
+        sets: "3×5-10",
+        image: "assets/pushups/diamond-pushup.jpg",
+        how: "Поставь ладони близко друг к другу. Большие и указательные пальцы могут образовать треугольник или алмаз.",
+        passive: "Опускайся медленно, грудь идёт к области рук. Держи локти под контролем.",
+        active: "Выжимайся вверх, концентрируясь на трицепсе.",
+        control: "Сложнее узких. Делать только если нет боли в запястьях.",
+        feeling: "Трицепс должен включаться сильнее всего, без острой боли в кистях."
+      },
+      pikePushup: {
+        title: "Pike push-ups",
+        muscles: "плечи, верх груди, трицепс",
+        sets: "3×6-10",
+        image: "assets/pushups/pike-pushup.jpg",
+        how: "Поставь руки на пол, таз подними вверх, тело похоже на домик. Голова движется к полу между руками.",
+        passive: "Опускай голову вниз медленно. Нагрузка должна идти в плечи.",
+        active: "Выталкивай себя вверх плечами и руками.",
+        control: "Не превращай упражнение в обычное отжимание. Таз должен быть высоко. Поясницу не ломать.",
+        feeling: "Основное ощущение — плечи и верх корпуса, не шея и не поясница."
+      },
+      plancheLean: {
+        title: "Planche lean hold",
+        muscles: "плечи, корпус, трицепс, предплечья",
+        sets: "3×10-20 секунд",
+        image: "assets/pushups/planche-lean-hold.jpg",
+        how: "Встань в верхнюю позицию отжимания. Немного подай плечи вперёд за линию кистей. Корпус держи прямым.",
+        passive: "Фазы вниз нет, это статическое упражнение.",
+        active: "Активная работа — удерживать наклон и не давать корпусу провиснуть.",
+        control: "Если поясница провисает или запястья болят — уменьши наклон.",
+        feeling: "Чувствуется плечевой пояс, пресс и лёгкая работа предплечий."
+      },
+      squat: {
+        title: "Приседания с собственным весом",
+        muscles: "квадрицепс, ягодицы, задняя поверхность бедра, корпус",
+        sets: "3×10-15",
+        image: "assets/body/squat.jpg",
+        how: "Стопы примерно на ширине плеч. Носки слегка наружу. Спина нейтральная, живот подтянут.",
+        passive: "Опускайся вниз спокойно, будто садишься на стул. Колени идут по направлению носков.",
+        active: "Поднимайся вверх через пятки и середину стопы, напрягая ягодицы.",
+        control: "Не округляй поясницу внизу. Если спина теряет форму — уменьши глубину.",
+        feeling: "Должны работать ноги и ягодицы, а не поясница."
+      },
+      reverseLunge: {
+        title: "Выпады назад",
+        muscles: "ягодицы, квадрицепс, баланс, корпус",
+        sets: "3×8-12 на ногу",
+        image: "assets/body/reverse-lunge.jpg",
+        how: "Сделай шаг назад и опустись вниз. Передняя стопа полностью стоит на полу.",
+        passive: "Опускайся спокойно, корпус держи ровно.",
+        active: "Вернись вверх через переднюю ногу, толкая пол пяткой.",
+        control: "Колено передней ноги не заваливается внутрь. Поясницу не скручивать.",
+        feeling: "Передняя нога и ягодица должны работать сильнее всего."
+      },
+      calfRaise: {
+        title: "Подъём на носки стоя",
+        muscles: "икры, стопы, голеностоп",
+        sets: "3×15-25",
+        image: "assets/body/calf-raise.jpg",
+        how: "Встань ровно, держись за стену при необходимости. Поднимайся на носки.",
+        passive: "Опускай пятки вниз медленно.",
+        active: "Поднимайся вверх до полного сокращения икр.",
+        control: "Не раскачивайся корпусом. Движение только через голеностоп.",
+        feeling: "Жжение в икрах — нормально."
+      },
+      wallSit: {
+        title: "Стульчик у стены",
+        muscles: "квадрицепс, ягодицы, корпус",
+        sets: "3×20-45 секунд",
+        image: "assets/body/wall-sit.jpg",
+        how: "Прижмись спиной к стене и опустись в положение сидя.",
+        passive: "Фазы вниз почти нет, это статическое удержание.",
+        active: "Активная работа — удерживать положение ног и корпуса.",
+        control: "Поясницу не отрывать резко от стены. Не уходить слишком низко, если тяжело.",
+        feeling: "Должны гореть бёдра, не поясница."
+      }
+    };
+
+    const dailyBaseLibrary = {
+      id: "section-base",
+      title: "Ежедневная база — Спина + Пресс",
+      note: "Эта база выполняется каждый день",
+      intro: "Каждый тренировочный день начинается с безопасной базы: Cat-cow, Bird-dog, Dead bug, ягодичный мостик и планка. Это не отдельная тяжёлая тренировка, а мягкая защита поясницы и сборка корпуса.",
+      exercises: [
+        exercises.catCow,
+        exercises.birdDog,
+        exercises.deadBug,
+        exercises.gluteBridge,
+        exercises.plank
+      ]
+    };
+
+    const cycleDays = [
+      {
+        id: "section-day-1",
+        title: "День 1 (A)",
+        note: "Спина + пресс + грудь + трицепс",
+        description: "Начни с ежедневной базы. После неё: грудь через отжимания и добор трицепса.",
+        exercises: [
+          exercises.classicPushup,
+          exercises.widePushup,
+          exercises.slowPushup,
+          exercises.closeGripPushup,
+          exercises.diamondPushup
+        ]
+      },
+      {
+        id: "section-day-2",
+        title: "День 2 (B)",
+        note: "Спина + пресс + ноги",
+        description: "Начни с ежедневной базы. Затем сделай спокойную работу на ноги и таз без прыжков.",
+        exercises: [
+          exercises.squat,
+          exercises.gluteBridge,
+          exercises.reverseLunge,
+          exercises.calfRaise,
+          exercises.wallSit
+        ]
+      },
+      {
+        id: "section-day-3",
+        title: "День 3 (A)",
+        note: "Повтор дня 1",
+        description: "Начни с ежедневной базы. Потом повтори схему груди и трицепса, сохраняя чистую технику.",
+        exercises: [
+          exercises.classicPushup,
+          exercises.widePushup,
+          exercises.slowPushup,
+          exercises.closeGripPushup,
+          exercises.diamondPushup
+        ]
+      },
+      {
+        id: "section-day-4",
+        title: "День 4 (B)",
+        note: "Повтор дня 2",
+        description: "Начни с ежедневной базы. Потом повтори схему ног, без спешки и без потери формы.",
+        exercises: [
+          exercises.squat,
+          exercises.gluteBridge,
+          exercises.reverseLunge,
+          exercises.calfRaise,
+          exercises.wallSit
+        ]
+      },
+      {
+        id: "section-day-5",
+        title: "День 5 (C)",
+        note: "Спина + пресс + плечи + лёгкая грудь",
+        description: "Начни с ежедневной базы. Основной акцент — плечи, а грудь идёт в лёгком и контролируемом режиме.",
+        exercises: [
+          exercises.pikePushup,
+          exercises.plancheLean,
+          exercises.classicPushup,
+          exercises.slowPushup
+        ]
+      },
+      {
+        id: "section-day-6",
+        title: "День 6 (C)",
+        note: "Повтор дня 5",
+        description: "Начни с ежедневной базы. Затем повтори день плеч и лёгкой груди без отказа и без рывков.",
+        exercises: [
+          exercises.pikePushup,
+          exercises.plancheLean,
+          exercises.classicPushup,
+          exercises.slowPushup
+        ]
+      }
+    ];
+
+    const levelGuides = {
+      base: {
+        1: "Cat-cow, Bird-dog, Dead bug и короткая планка без боли.",
+        2: "База каждый день, чуть больше контроля в планке и ягодичном мостике.",
+        3: "Удлиняй удержания и держи технику без провала поясницы.",
+        4: "Больше качества: медленные фазы, стабильный таз, ровное дыхание.",
+        5: "Уровень поддержки: база остаётся аккуратной и регулярной, без перегруза."
+      },
+      chest: {
+        1: "Классика 2-3 подхода и медленные отжимания.",
+        2: "Добавь широкие и держи ровный корпус на каждом повторе.",
+        3: "Чередуй классику, широкие и медленный темп без провала поясницы.",
+        4: "Увеличивай только качество и объём, не скорость.",
+        5: "Сохраняй идеальную технику и не гони нагрузку любой ценой."
+      },
+      legs: {
+        1: "Приседания, ягодичный мост и подъём на носки.",
+        2: "Добавь стульчик у стены и больше контроля в приседе.",
+        3: "Подключай выпады назад и работай над устойчивостью таза.",
+        4: "Усложняй только если спина спокойна и форма не ломается.",
+        5: "Закрепляй силу ног и ягодиц без ударной нагрузки."
+      },
+      shoulders: {
+        1: "Pike push-ups и короткий planche lean без провала поясницы.",
+        2: "Увеличивай только при чистом корпусе и спокойной пояснице.",
+        3: "Больше контроля в наклоне и в верхней позиции.",
+        4: "Можно удлинять удержания, если техника не распадается.",
+        5: "Уровень точности: плечи работают, поясница не вмешивается."
+      },
+      triceps: {
+        1: "Узкие отжимания с чистой линией корпуса.",
+        2: "Добавь алмазные только если запястья спокойны.",
+        3: "Увеличивай повторы без развала локтей и корпуса.",
+        4: "Чередуй узкие и алмазные, если техника уверенная.",
+        5: "Сохраняй контроль и не уходи в боль в запястьях."
+      }
+    };
+
+    function getDefaultTrainingProgress() {
+      return {
+        base: { level: 1, cleanSessions: 0, lastResult: {}, recommendation: "" },
+        chest: { level: 1, cleanSessions: 0, lastResult: {}, recommendation: "" },
+        legs: { level: 1, cleanSessions: 0, lastResult: {}, recommendation: "" },
+        shoulders: { level: 1, cleanSessions: 0, lastResult: {}, recommendation: "" },
+        triceps: { level: 1, cleanSessions: 0, lastResult: {}, recommendation: "" }
+      };
+    }
+
+    function loadTrainingProgress() {
+      try {
+        const raw = localStorage.getItem(trainingProgressKey);
+        const defaults = getDefaultTrainingProgress();
+        if (!raw) return defaults;
+
+        const parsed = JSON.parse(raw) || {};
+        return {
+          base: { ...defaults.base, ...(parsed.base || parsed.core || parsed.abs || {}) },
+          chest: { ...defaults.chest, ...(parsed.chest || parsed.pushups || {}) },
+          legs: { ...defaults.legs, ...(parsed.legs || {}) },
+          shoulders: { ...defaults.shoulders, ...(parsed.shoulders || {}) },
+          triceps: { ...defaults.triceps, ...(parsed.triceps || {}) }
+        };
+      } catch (error) {
+        return getDefaultTrainingProgress();
+      }
+    }
+
+    function buildStoredTrainingProgress(progress) {
+      return {
+        ...progress,
+        pushups: progress.chest,
+        legs: progress.legs,
+        core: progress.base
+      };
+    }
+
+    function saveTrainingProgress(progress) {
+      localStorage.setItem(trainingProgressKey, JSON.stringify(buildStoredTrainingProgress(progress)));
+    }
+
+    function updateProgressionAlert() {
+      const isPain = backFeelingEl.value === "pain";
+      progressionAlertEl.classList.toggle("is-danger", isPain);
+      progressionAlertEl.textContent = isPain
+        ? "Если есть боль — остановиться. Следующую тренировку лучше облегчить или пропустить."
+        : "Спина и пресс выполняются каждый день. Сохраняй результат только после честной оценки техники и поясницы.";
+    }
+
+    function renderTrainingProgress() {
+      const progress = loadTrainingProgress();
+      const labels = {
+        base: "База: спина + пресс",
+        chest: "Грудь",
+        legs: "Ноги",
+        shoulders: "Плечи",
+        triceps: "Трицепс"
+      };
+
+      progressSummaryEl.innerHTML = Object.keys(labels).map((key) => {
+        const item = progress[key];
+        const lastResult = item.lastResult || {};
+        const isLevelUp = Boolean(lastResult.levelUp);
+        const isDanger = lastResult.backFeeling === "pain";
+
+        return `
+          <article class="summary-card${isLevelUp ? " is-level-up" : ""}${isDanger ? " is-danger" : ""}">
+            <div class="summary-top">
+              <div class="summary-title">${labels[key]}</div>
+              <div class="summary-level">Уровень ${item.level}/5</div>
+            </div>
+            <div class="detail-block">
+              <strong>Чистые сессии</strong>
+              <p>${item.cleanSessions}</p>
+            </div>
+            <div class="detail-block">
+              <strong>Текущий фокус уровня</strong>
+              <p>${levelGuides[key][item.level]}</p>
+            </div>
+            <div class="recommendation">${item.recommendation || "Пока нет сохранённых рекомендаций."}</div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function saveTrainingResult() {
+      const progress = loadTrainingProgress();
+      const trainingType = trainingTypeEl.value;
+      const technique = techniqueRatingEl.value;
+      const backState = backFeelingEl.value;
+      const difficulty = difficultyRatingEl.value;
+      const current = { ...progress[trainingType] };
+
+      current.lastResult = {
+        technique: technique,
+        backFeeling: backState,
+        difficulty: difficulty,
+        savedAt: new Date().toISOString(),
+        levelUp: false
+      };
+
+      if (backState === "pain") {
+        current.cleanSessions = 0;
+        current.recommendation = "Стоп. Следующую тренировку сделать в облегчённом режиме или пропустить. Без боли.";
+      } else if (backState === "discomfort") {
+        current.cleanSessions = 0;
+        current.recommendation = "Не повышать нагрузку. Следующую тренировку сделать легче: меньше повторов или облегчённый вариант.";
+      } else if (technique === "bad") {
+        current.cleanSessions = 0;
+        current.recommendation = "Сначала вернуть чистую технику. Уменьшить повторы или амплитуду.";
+      } else if (technique === "medium") {
+        current.recommendation = "Закрепить текущий уровень. Не добавлять нагрузку.";
+      } else if (technique === "clean" && backState === "normal") {
+        if (difficulty === "hard") {
+          current.recommendation = "Остаться на текущем уровне. Цель — закрепить технику.";
+        } else if (difficulty === "normal") {
+          current.cleanSessions += 1;
+          current.recommendation = "Хорошо. Можно добавить 1-2 повтора или немного времени в следующей тренировке.";
+        } else if (difficulty === "easy") {
+          current.cleanSessions += 1;
+          current.recommendation = "Легко и чисто. Можно добавить подход, повторы или чуть более сложный вариант.";
+        }
+      }
+
+      if (current.cleanSessions >= 3) {
+        if (current.level < 5) {
+          current.level += 1;
+          current.lastResult.levelUp = true;
+          current.recommendation = "Уровень повышен. Следующая тренировка — немного сложнее, но без отказа.";
+        } else {
+          current.recommendation = "Уровень 5 уже достигнут. Держи чистую технику и не гони нагрузку любой ценой.";
+        }
+        current.cleanSessions = 0;
+      }
+
+      progress[trainingType] = current;
+      saveTrainingProgress(progress);
+      renderTrainingProgress();
+      updateProgressionAlert();
+    }
+
+    function resetTrainingProgress() {
+      if (!window.confirm("Сбросить прогрессию? Все уровни и рекомендации будут очищены.")) return;
+      saveTrainingProgress(getDefaultTrainingProgress());
+      renderTrainingProgress();
+      updateProgressionAlert();
+    }
+
+    function createMediaMarkup(title, image) {
+      return `
+        <div class="exercise-media is-missing">
+          <img src="${image}" alt="${title}" onload="this.parentElement.classList.remove('is-missing')" onerror="this.parentElement.classList.add('is-missing')" />
+          <div class="exercise-media-placeholder">${title}</div>
+        </div>
+      `;
+    }
+
+    function createExerciseAccordion(exercise, accordionId) {
+      return `
+        <article class="exercise-card accordion-item" id="${accordionId}">
+          <button type="button" class="accordion-button" onclick="toggleAccordion('${accordionId}')">
+            <div>
+              <strong>${exercise.title}</strong>
+              <span>${exercise.muscles}</span><br />
+              <span>${exercise.sets}</span>
+            </div>
+            <div class="accordion-marker">+</div>
+          </button>
+          <div class="accordion-panel">
+            <div class="accordion-stack">
+              ${createMediaMarkup(exercise.title, exercise.image)}
+              <div class="detail-block">
+                <strong>Как делать</strong>
+                <p>${exercise.how}</p>
+              </div>
+              <div class="detail-block">
+                <strong>Пассивная фаза</strong>
+                <p>${exercise.passive}</p>
+              </div>
+              <div class="detail-block">
+                <strong>Активная фаза</strong>
+                <p>${exercise.active}</p>
+              </div>
+              <div class="detail-block">
+                <strong>Контроль техники</strong>
+                <p>${exercise.control}</p>
+              </div>
+              <div class="detail-block">
+                <strong>Ощущение</strong>
+                <p>${exercise.feeling}</p>
+              </div>
+            </div>
+          </div>
+        </article>
+      `;
+    }
+
+    function createSectionAccordion(id, title, note, intro, exercisesList, showDailyBaseHint, dayNumber) {
+      const exercisePrefix = id.replace("section-", "exercise-");
+      const accordionId = id + "-accordion";
+
+      return `
+        <div class="anchor-section" id="${id}">
+          <section class="card accordion-item${showDailyBaseHint ? " cycle-day-accordion" : " base-accordion"}" id="${accordionId}"${dayNumber ? ` data-day-number="${dayNumber}"` : ""}>
+            <button type="button" class="accordion-button" onclick="toggleAccordion('${accordionId}')">
+              <div>
+                <strong>${title}</strong>
+                <span>${note}</span>
+              </div>
+              <div class="accordion-marker">+</div>
+            </button>
+            <div class="accordion-panel">
+              <p class="section-description">${intro}</p>
+              ${showDailyBaseHint ? '<div class="detail-block"><strong>Перед основной частью</strong><p>Начни с ежедневной базы.</p></div>' : ""}
+              <div class="exercise-grid">
+                ${exercisesList.map((exercise, index) => createExerciseAccordion(exercise, exercisePrefix + "-" + index)).join("")}
+              </div>
+            </div>
+          </section>
+        </div>
+      `;
+    }
+
+    function toggleAccordion(id) {
+      const item = document.getElementById(id);
+      if (!item) return;
+      item.classList.toggle("is-open");
+      syncAccordionMarkers();
+    }
+
+    function collapseAll() {
+      document.querySelectorAll(".accordion-item.is-open").forEach((item) => {
+        item.classList.remove("is-open");
+      });
+      syncAccordionMarkers();
+    }
+
+    function openCycleDay(dayNumber) {
+      collapseAll();
+      const target = document.querySelector('.cycle-day-accordion[data-day-number="' + dayNumber + '"]')
+        || document.querySelector('.cycle-day-accordion[data-day-number="1"]');
+
+      if (target) {
+        target.classList.add("is-open");
+        syncAccordionMarkers();
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    function syncAccordionMarkers() {
+      document.querySelectorAll(".accordion-item").forEach((item) => {
+        const marker = item.querySelector(".accordion-marker");
+        if (marker) {
+          marker.textContent = item.classList.contains("is-open") ? "−" : "+";
+        }
+      });
+    }
+
+    function renderLibrary() {
+      const root = document.getElementById("libraryRoot");
+      root.innerHTML = [
+        createSectionAccordion(
+          dailyBaseLibrary.id,
+          dailyBaseLibrary.title,
+          dailyBaseLibrary.note,
+          dailyBaseLibrary.intro,
+          dailyBaseLibrary.exercises,
+          false
+        ),
+        '<section class="card anchor-section" id="section-cycle"><div class="section-head"><h2>6-дневный цикл</h2><div class="section-note">База каждый день + основной фокус</div></div><p class="section-description">Спина и пресс выполняются каждый день через ежедневную базу. Поверх неё идёт основной фокус дня: грудь, трицепс, ноги или плечи.</p><div class="warning">Явная логика цикла: сначала база для спины и пресса, потом основная тренировка дня.</div></section>',
+        cycleDays.map((day, index) => createSectionAccordion(day.id, day.title, day.note, day.description, day.exercises, true, index + 1)).join(""),
+        '<section class="card anchor-section" id="section-rest"><div class="section-head"><h2>День 7 — отдых / восстановление</h2><div class="section-note">Без силовой нагрузки</div></div><p class="section-description">Прогулка, мягкая разминка плеч, груди и запястий. Если мышцы забиты — отдых обязателен. Рост идёт не только во время нагрузки, но и во время восстановления.</p></section>'
+      ].join("");
+    }
+
+    renderLibrary();
+    renderTrainingProgress();
+    updateProgressionAlert();
+    syncAccordionMarkers();
+    backFeelingEl.addEventListener("change", updateProgressionAlert);
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js").catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
