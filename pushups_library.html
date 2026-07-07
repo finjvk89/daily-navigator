@@ -1148,13 +1148,17 @@
     function openTodayTraining() {
       const dayOfWeek = new Date().getDay();
       if (dayOfWeek === 0) {
-        collapseAll();
-        const rest = document.getElementById("section-rest");
-        if (rest) rest.scrollIntoView({ behavior: "smooth", block: "start" });
+        openRestDay();
         return;
       }
 
       openCycleDay(dayOfWeek);
+    }
+
+    function openRestDay() {
+      collapseAll();
+      const target = document.getElementById("section-rest");
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
     function syncAccordionMarkers() {

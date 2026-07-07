@@ -851,20 +851,7 @@
       }
 
       .summary-stats {
-        grid-template-columns: 1fr;
-        gap: 4px;
-      }
-
-      .stat {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 6px 10px;
-      }
-
-      .stat-value {
-        font-size: 14px;
-        margin-bottom: 0;
+        display: none;
       }
 
       main.grid .accordion-item:not(.is-open):not(#mainFocusCard) .accordion-button .section-note {
@@ -909,10 +896,6 @@
 
       .summary-top {
         flex-direction: column;
-      }
-
-      .summary-stats {
-        grid-template-columns: 1fr;
       }
 
       .buttons {
@@ -1161,12 +1144,12 @@
         <div class="mini-plan">
           <div class="small">План отжиманий на неделю</div>
           <div class="mini-plan-grid">
-            <div class="mini-plan-item">День 1 — Грудь+Трицепс</div>
+            <div class="mini-plan-item">День 1 — Грудь + Трицепс</div>
             <div class="mini-plan-item">День 2 — Ноги</div>
-            <div class="mini-plan-item">День 3 — Грудь+Трицепс (повтор)</div>
+            <div class="mini-plan-item">День 3 — Грудь + Трицепс (повтор)</div>
             <div class="mini-plan-item">День 4 — Ноги (повтор)</div>
-            <div class="mini-plan-item">День 5 — Плечи+лёгкая грудь</div>
-            <div class="mini-plan-item">День 6 — Плечи+лёгкая грудь (повтор)</div>
+            <div class="mini-plan-item">День 5 — Плечи + лёгкая грудь</div>
+            <div class="mini-plan-item">День 6 — Плечи + лёгкая грудь (повтор)</div>
             <div class="mini-plan-item">День 7 — Отдых</div>
           </div>
           <div class="row"><input data-check type="checkbox" id="pushups_training" /><label for="pushups_training">Тренировка отжиманий выполнена</label></div>
@@ -2298,7 +2281,7 @@
     }
 
     function startNewDay() {
-      if (!window.confirm("Начать новый день? Чекбоксы будут сброшены")) return;
+      if (!window.confirm("Начать новый день? Чекбоксы и текстовые поля будут очищены")) return;
 
       document.querySelectorAll("[data-check]").forEach((el) => {
         el.checked = false;
