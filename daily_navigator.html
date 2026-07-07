@@ -630,6 +630,65 @@
       color: var(--danger);
     }
 
+    main.grid .accordion-item {
+      display: grid;
+      gap: 10px;
+    }
+
+    main.grid .accordion-button {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      text-align: left;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      box-shadow: none;
+      font: inherit;
+    }
+
+    main.grid .accordion-button:hover {
+      transform: none;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    main.grid .accordion-button strong {
+      display: block;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    main.grid .accordion-button span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    main.grid .accordion-marker {
+      color: var(--accent-2);
+      font-size: 18px;
+      line-height: 1;
+      padding-top: 2px;
+      flex: 0 0 auto;
+    }
+
+    main.grid .accordion-panel {
+      display: none;
+    }
+
+    main.grid .accordion-item.is-open .accordion-panel {
+      display: block;
+    }
+
+    main.grid .accordion-item.is-open > .accordion-button {
+      border-color: rgba(124, 199, 255, 0.25);
+      background: rgba(124, 199, 255, 0.08);
+    }
+
     .menu-toggle {
       display: none;
       align-items: center;
@@ -866,6 +925,52 @@
         grid-template-columns: 1fr;
       }
     }
+
+    @media (min-width: 901px) {
+      main.grid .accordion-panel {
+        display: block !important;
+        max-height: none !important;
+      }
+
+      main.grid .accordion-chevron {
+        display: none;
+      }
+
+      main.grid .accordion-item {
+        display: block;
+      }
+
+      main.grid .accordion-button {
+        pointer-events: none;
+        cursor: default;
+        width: auto;
+        justify-content: space-between;
+        align-items: baseline;
+        padding: 0;
+        margin-bottom: 12px;
+        border: 0;
+        background: transparent;
+        box-shadow: none;
+        border-radius: 0;
+      }
+
+      main.grid .accordion-button:hover,
+      main.grid .accordion-item.is-open > .accordion-button {
+        background: transparent;
+        border-color: transparent;
+      }
+
+      main.grid .accordion-button strong {
+        font-size: 20px;
+        line-height: 1.2;
+        font-weight: 700;
+        margin: 0 0 6px;
+      }
+
+      main.grid .accordion-button span {
+        font-size: 13px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -945,11 +1050,15 @@
     </section>
 
     <main class="grid">
-      <section class="card span-8 focus-card" id="mainFocusCard">
-        <div class="card-head">
-          <h2>Сегодня главное</h2>
-          <span class="section-note small">3 якоря, чтобы не расползтись</span>
-        </div>
+      <section class="card span-8 focus-card accordion-item is-open" id="mainFocusCard">
+        <button type="button" class="accordion-button" onclick="toggleAccordion('mainFocusCard')">
+          <div>
+            <strong>Сегодня главное</strong>
+            <span>3 якоря, чтобы не расползтись</span>
+          </div>
+          <div class="accordion-marker accordion-chevron">−</div>
+        </button>
+        <div class="accordion-panel">
         <div class="focus-hint">Сначала сделай это</div>
         <div class="tasks">
           <div class="field">
@@ -969,10 +1078,15 @@
             <textarea id="dontTouch" data-save="dont_touch" placeholder="Сюда записывать всё, что отвлекает и не входит в главный маршрут"></textarea>
           </div>
         </div>
+        </div>
       </section>
 
-      <section class="card span-4">
-        <h2>Сон</h2>
+      <section class="card span-4 accordion-item">
+        <button type="button" class="accordion-button" onclick="toggleAccordion(this)">
+          <div><strong>Сон</strong></div>
+          <div class="accordion-marker accordion-chevron">+</div>
+        </button>
+        <div class="accordion-panel">
         <div class="field">
           <label for="sleepHours">Сколько спал?</label>
           <select id="sleepHours" data-save="sleep_hours">
@@ -985,20 +1099,30 @@
           </select>
         </div>
         <div class="row"><input data-check type="checkbox" id="wokeFresh" /><label for="wokeFresh">Проснулся бодрым</label></div>
+        </div>
       </section>
 
-      <section class="card span-4" id="section-prayer">
-        <h2>Намаз</h2>
+      <section class="card span-4 accordion-item" id="section-prayer">
+        <button type="button" class="accordion-button" onclick="toggleAccordion('section-prayer')">
+          <div><strong>Намаз</strong></div>
+          <div class="accordion-marker accordion-chevron">+</div>
+        </button>
+        <div class="accordion-panel">
         <div class="row"><input data-check type="checkbox" id="fajr" /><label for="fajr">Фаджр</label></div>
         <div class="row"><input data-check type="checkbox" id="zuhr" /><label for="zuhr">Зухр</label></div>
         <div class="row"><input data-check type="checkbox" id="asr" /><label for="asr">Аср</label></div>
         <div class="row"><input data-check type="checkbox" id="maghrib" /><label for="maghrib">Магриб</label></div>
         <div class="row"><input data-check type="checkbox" id="isha" /><label for="isha">Иша</label></div>
         <div class="row"><input data-check type="checkbox" id="tahajjud" /><label for="tahajjud">Тахаджуд, если Аллах дал проснуться</label></div>
+        </div>
       </section>
 
-      <section class="card span-4" id="section-body">
-        <h2>Тело</h2>
+      <section class="card span-4 accordion-item" id="section-body">
+        <button type="button" class="accordion-button" onclick="toggleAccordion('section-body')">
+          <div><strong>Тело</strong></div>
+          <div class="accordion-marker accordion-chevron">+</div>
+        </button>
+        <div class="accordion-panel">
         <div class="row"><input data-check type="checkbox" id="steps" /><label for="steps">1000 шагов</label></div>
         <div class="row"><input data-check type="checkbox" id="water" /><label for="water">Вода и нормальная еда</label></div>
         <div class="mini-plan">
@@ -1025,62 +1149,92 @@
           <label for="bodyNotes">План по телу</label>
           <textarea id="bodyNotes" data-save="body_notes" placeholder="Сегодня: Body Library. Отметь отжимания / ноги / пресс-корсет по факту выполнения. Спина отдельно закрывается в блоке упражнений для спины."></textarea>
         </div>
+        </div>
       </section>
 
-      <section class="card span-4">
-        <h2>Коран / арабский</h2>
+      <section class="card span-4 accordion-item">
+        <button type="button" class="accordion-button" onclick="toggleAccordion(this)">
+          <div><strong>Коран / арабский</strong></div>
+          <div class="accordion-marker accordion-chevron">+</div>
+        </button>
+        <div class="accordion-panel">
         <div class="row"><input data-check type="checkbox" id="quran" /><label for="quran">Чтение Корана</label></div>
         <div class="row"><input data-check type="checkbox" id="arabic" /><label for="arabic">Арабский 10-15 минут</label></div>
         <div class="field">
           <label for="quranNotes">Что учил или читал</label>
           <textarea id="quranNotes" data-save="quran_notes" placeholder="Короткая запись по Корану или арабскому"></textarea>
         </div>
+        </div>
       </section>
 
-      <section class="card span-6" id="section-work">
-        <h2>Работа</h2>
+      <section class="card span-6 accordion-item" id="section-work">
+        <button type="button" class="accordion-button" onclick="toggleAccordion('section-work')">
+          <div><strong>Работа</strong></div>
+          <div class="accordion-marker accordion-chevron">+</div>
+        </button>
+        <div class="accordion-panel">
         <div class="row"><input data-check type="checkbox" id="work_main" /><label for="work_main">Главный рабочий блок закрыт</label></div>
         <div class="row"><input data-check type="checkbox" id="work_files" /><label for="work_files">Файлы, переписка и хвосты разобраны</label></div>
         <div class="field">
           <label for="workNotes">Заметки по работе</label>
           <textarea id="workNotes" data-save="work_notes" placeholder="Проекты, чертежи, ВОР, смета, что нужно не потерять"></textarea>
         </div>
+        </div>
       </section>
 
-      <section class="card span-6">
-        <div class="card-head">
-          <h2>Рабочие объекты</h2>
-          <span class="section-note small">Список объектов и разделов</span>
-        </div>
+      <section class="card span-6 accordion-item">
+        <button type="button" class="accordion-button" onclick="toggleAccordion(this)">
+          <div>
+            <strong>Рабочие объекты</strong>
+            <span>Список объектов и разделов</span>
+          </div>
+          <div class="accordion-marker accordion-chevron">+</div>
+        </button>
+        <div class="accordion-panel">
         <div class="objects-toolbar">
           <input id="objectNameInput" type="text" placeholder="Название объекта" />
           <button type="button" onclick="addObject()">Добавить объект</button>
         </div>
         <div id="objectsList" class="objects-list"></div>
+        </div>
       </section>
 
-      <section class="card span-6" id="section-enginepp">
-        <h2>EnginePP</h2>
+      <section class="card span-6 accordion-item" id="section-enginepp">
+        <button type="button" class="accordion-button" onclick="toggleAccordion('section-enginepp')">
+          <div><strong>EnginePP</strong></div>
+          <div class="accordion-marker accordion-chevron">+</div>
+        </button>
+        <div class="accordion-panel">
         <div class="row"><input data-check type="checkbox" id="enginepp_task" /><label for="enginepp_task">Одна задача EnginePP выполнена</label></div>
         <div class="row"><input data-check type="checkbox" id="enginepp_test" /><label for="enginepp_test">Проверка или тестирование сделаны</label></div>
         <div class="field">
           <label for="engineppNotes">Заметки по EnginePP</label>
           <textarea id="engineppNotes" data-save="enginepp_notes" placeholder="Баг, модуль, промпт, библиотека, важная мысль"></textarea>
         </div>
+        </div>
       </section>
 
-      <section class="card span-6" id="section-unity">
-        <h2>Unity game</h2>
+      <section class="card span-6 accordion-item" id="section-unity">
+        <button type="button" class="accordion-button" onclick="toggleAccordion('section-unity')">
+          <div><strong>Unity game</strong></div>
+          <div class="accordion-marker accordion-chevron">+</div>
+        </button>
+        <div class="accordion-panel">
         <div class="row"><input data-check type="checkbox" id="unity_small" /><label for="unity_small">Сделан маленький шаг по Unity</label></div>
         <div class="row"><input data-check type="checkbox" id="unity_no_overdo" /><label for="unity_no_overdo">Не ушёл в Unity вместо основной работы</label></div>
         <div class="field">
           <label for="unityNotes">Заметки по Unity</label>
           <textarea id="unityNotes" data-save="unity_notes" placeholder="Механика, сцена, UI, баланс, Android build"></textarea>
         </div>
+        </div>
       </section>
 
-      <section class="card span-6" id="section-brain">
-        <h2>Мозг / чтение</h2>
+      <section class="card span-6 accordion-item" id="section-brain">
+        <button type="button" class="accordion-button" onclick="toggleAccordion('section-brain')">
+          <div><strong>Мозг / чтение</strong></div>
+          <div class="accordion-marker accordion-chevron">+</div>
+        </button>
+        <div class="accordion-panel">
         <div class="row"><input data-check type="checkbox" id="reading" /><label for="reading">Чтение до 30 минут</label></div>
         <div class="row"><input data-check type="checkbox" id="brain" /><label for="brain">Упражнения для мозга</label></div>
         <div class="small" id="brainToday">Сегодня для мозга: -</div>
@@ -1095,36 +1249,51 @@
           <label for="brainNotes">Что читал или тренировал</label>
           <textarea id="brainNotes" data-save="brain_notes" placeholder="Книга, тема или упражнение"></textarea>
         </div>
+        </div>
       </section>
 
-      <section class="card span-8">
-        <div class="card-head">
-          <h2>Распорядок</h2>
-          <span class="section-note small">Простой ритм без перегруза</span>
-        </div>
+      <section class="card span-8 accordion-item">
+        <button type="button" class="accordion-button" onclick="toggleAccordion(this)">
+          <div>
+            <strong>Распорядок</strong>
+            <span>Простой ритм без перегруза</span>
+          </div>
+          <div class="accordion-marker accordion-chevron">+</div>
+        </button>
+        <div class="accordion-panel">
         <div class="schedule">
           <div class="time-block"><div class="time">Утро</div><div>Фаджр, план дня, главный рабочий блок до хаоса и отвлечений.</div></div>
           <div class="time-block"><div class="time">День</div><div>Работа, Зухр, EnginePP, Аср и реальные проектные задачи.</div></div>
           <div class="time-block"><div class="time">Вечер</div><div>Магриб, тело, маленький шаг по Unity, Коран или арабский, Иша.</div></div>
           <div class="time-block"><div class="time">Ночь</div><div>Спокойное завершение, итог дня, сон и Тахаджуд, если проснулся.</div></div>
         </div>
+        </div>
       </section>
 
-      <section class="card span-4" id="section-rest">
-        <h2>Отдых</h2>
+      <section class="card span-4 accordion-item" id="section-rest">
+        <button type="button" class="accordion-button" onclick="toggleAccordion('section-rest')">
+          <div><strong>Отдых</strong></div>
+          <div class="accordion-marker accordion-chevron">+</div>
+        </button>
+        <div class="accordion-panel">
         <div class="row"><input data-check type="checkbox" id="rest" /><label for="rest">Отдых без чувства вины</label></div>
         <div class="row"><input data-check type="checkbox" id="no_chaos" /><label for="no_chaos">Не распылялся между 10 задачами</label></div>
         <div class="field">
           <label for="restNotes">Что было отдыхом</label>
           <textarea id="restNotes" data-save="rest_notes" placeholder="Игры, фильм, YouTube или просто тишина"></textarea>
         </div>
+        </div>
       </section>
 
-      <section class="card span-12">
-        <div class="card-head">
-          <h2>Упражнения для спины</h2>
-          <span class="section-note small">Мягко, без боли и рывков</span>
-        </div>
+      <section class="card span-12 accordion-item">
+        <button type="button" class="accordion-button" onclick="toggleAccordion(this)">
+          <div>
+            <strong>Упражнения для спины</strong>
+            <span>Мягко, без боли и рывков</span>
+          </div>
+          <div class="accordion-marker accordion-chevron">+</div>
+        </button>
+        <div class="accordion-panel">
         <div class="small">10-15 минут спокойно. Это не силовая тренировка, а защита поясницы и мягкая стабилизация.</div>
         <div class="small" id="backTimerDisplay">15:00</div>
         <div class="buttons">
@@ -1144,22 +1313,32 @@
         </div>
         <div class="small">Мини-набор: 5-6 упражнений максимум, без перегруза.</div>
         <div class="small">Правило: без боли, без рывков, без скручиваний. Если боль усиливается - остановиться.</div>
+        </div>
       </section>
 
-      <section class="card span-4">
-        <div class="card-head">
-          <h2>Недельный обзор</h2>
-          <span class="section-note small">Минимальный день за 7 дней</span>
-        </div>
+      <section class="card span-4 accordion-item">
+        <button type="button" class="accordion-button" onclick="toggleAccordion(this)">
+          <div>
+            <strong>Недельный обзор</strong>
+            <span>Минимальный день за 7 дней</span>
+          </div>
+          <div class="accordion-marker accordion-chevron">+</div>
+        </button>
+        <div class="accordion-panel">
         <div id="weeklyOverviewGrid" class="overview-grid"></div>
         <div id="weeklyOverviewTotal" class="overview-total">Минимальных дней: 0/7</div>
+        </div>
       </section>
 
-      <section class="card span-8">
-        <div class="card-head">
-          <h2>Календарь привычек</h2>
-          <span class="section-note small">Последние 7 дней и текущая серия</span>
-        </div>
+      <section class="card span-8 accordion-item">
+        <button type="button" class="accordion-button" onclick="toggleAccordion(this)">
+          <div>
+            <strong>Календарь привычек</strong>
+            <span>Последние 7 дней и текущая серия</span>
+          </div>
+          <div class="accordion-marker accordion-chevron">+</div>
+        </button>
+        <div class="accordion-panel">
         <div class="habit-calendar">
           <div class="habit-calendar-head small">
             <div>Привычка</div>
@@ -1168,22 +1347,32 @@
           </div>
           <div id="habitCalendarRows"></div>
         </div>
+        </div>
       </section>
 
-      <section class="card span-12">
-        <div class="card-head">
-          <h2>Данные</h2>
-          <span class="section-note small">Резервная копия и восстановление</span>
-        </div>
+      <section class="card span-12 accordion-item">
+        <button type="button" class="accordion-button" onclick="toggleAccordion(this)">
+          <div>
+            <strong>Данные</strong>
+            <span>Резервная копия и восстановление</span>
+          </div>
+          <div class="accordion-marker accordion-chevron">+</div>
+        </button>
+        <div class="accordion-panel">
         <div class="buttons">
           <button type="button" class="secondary" onclick="exportData()">Экспорт JSON</button>
           <button type="button" class="secondary" onclick="triggerImportData()">Импорт JSON</button>
         </div>
         <input id="importDataInput" type="file" accept=".json,application/json" style="display:none" />
+        </div>
       </section>
 
-      <section class="card span-12">
-        <h2>Итог дня</h2>
+      <section class="card span-12 accordion-item">
+        <button type="button" class="accordion-button" onclick="toggleAccordion(this)">
+          <div><strong>Итог дня</strong></div>
+          <div class="accordion-marker accordion-chevron">+</div>
+        </button>
+        <div class="accordion-panel">
         <div class="tasks">
           <div class="field">
             <label for="dayResult">Что сделал сегодня</label>
@@ -1193,6 +1382,7 @@
             <label for="tomorrowMain">Главное на завтра</label>
             <textarea id="tomorrowMain" data-save="tomorrow_main" placeholder="Одна главная цель, с которой начнётся следующий день"></textarea>
           </div>
+        </div>
         </div>
       </section>
     </main>
@@ -1245,6 +1435,57 @@
     function setSaveStatus(text, isError) {
       saveStatusEl.textContent = text;
       saveStatusEl.classList.toggle("error", Boolean(isError));
+    }
+
+    function toggleAccordion(idOrButton) {
+      const item = typeof idOrButton === "string"
+        ? document.getElementById(idOrButton)
+        : idOrButton.closest(".accordion-item");
+      if (!item) return;
+      item.classList.toggle("is-open");
+      syncAccordionMarkers();
+    }
+
+    function collapseAll() {
+      document.querySelectorAll("main.grid .accordion-item.is-open").forEach((item) => {
+        item.classList.remove("is-open");
+      });
+      syncAccordionMarkers();
+    }
+
+    function syncAccordionMarkers() {
+      document.querySelectorAll("main.grid .accordion-item").forEach((item) => {
+        const marker = item.querySelector(".accordion-marker");
+        if (marker) {
+          marker.textContent = item.classList.contains("is-open") ? "−" : "+";
+        }
+      });
+    }
+
+    function openSectionForNav(sectionId) {
+      const section = document.getElementById(sectionId);
+      if (!section) return;
+
+      if (window.matchMedia("(max-width: 900px)").matches) {
+        if (!section.classList.contains("is-open")) {
+          section.classList.add("is-open");
+          syncAccordionMarkers();
+        }
+      }
+
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function resetAccordionState() {
+      if (!window.matchMedia("(max-width: 900px)").matches) return;
+
+      document.querySelectorAll("main.grid .accordion-item").forEach((item) => {
+        item.classList.remove("is-open");
+      });
+
+      const mainFocus = document.getElementById("mainFocusCard");
+      if (mainFocus) mainFocus.classList.add("is-open");
+      syncAccordionMarkers();
     }
 
     function updateBrainExercise() {
@@ -2048,6 +2289,7 @@
     updateBackTimerDisplay();
     renderObjects();
     updateProgress();
+    syncAccordionMarkers();
 
     (function initMobileNav() {
       const menuToggle = document.getElementById("menuToggle");
@@ -2076,7 +2318,11 @@
       }
 
       function handleViewportChange() {
-        if (!mobileMedia.matches) closeMenu();
+        if (!mobileMedia.matches) {
+          closeMenu();
+        } else {
+          resetAccordionState();
+        }
       }
 
       menuToggle.addEventListener("click", () => {
@@ -2091,7 +2337,12 @@
       mobileNavOverlay.addEventListener("click", closeMenu);
 
       mobileNav.querySelectorAll('a[href^="#"]').forEach((link) => {
-        link.addEventListener("click", closeMenu);
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          const sectionId = link.getAttribute("href").slice(1);
+          closeMenu();
+          openSectionForNav(sectionId);
+        });
       });
 
       document.addEventListener("keydown", (event) => {
