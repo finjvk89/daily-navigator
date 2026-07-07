@@ -1,4 +1,4 @@
-const CACHE_NAME = "daily-navigator-v1";
+const CACHE_NAME = "daily-navigator-v2";
 
 const APP_SHELL = [
   "./",
@@ -30,10 +30,19 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
+  event.respondWith((async () => {
+    const cache = await caches.open(CACHE_NAME);
+
+    try {
+      const response = await fetch(event.request);
+      if (response && response.ok) {
+        cache.put(event.request, response.clone());
+      }
+      return response;
+    } catch (_) {
+      const cached = await cache.match(event.request);
       if (cached) return cached;
-      return fetch(event.request);
-    })
-  );
+      throw _;
+    }
+  })());
 });
