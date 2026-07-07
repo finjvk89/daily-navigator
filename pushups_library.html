@@ -491,7 +491,7 @@
       </nav>
       <div class="top-nav">
         <button type="button" class="secondary" onclick="collapseAll()">Свернуть всё</button>
-        <button type="button" class="secondary" onclick="openCycleDay(((new Date().getDay() + 5) % 6) + 1)">Раскрыть только сегодняшний день</button>
+        <button type="button" class="secondary" onclick="openTodayTraining()">Раскрыть только сегодняшний день</button>
       </div>
     </section>
 
@@ -1143,6 +1143,18 @@
         syncAccordionMarkers();
         target.scrollIntoView({ behavior: "smooth", block: "start" });
       }
+    }
+
+    function openTodayTraining() {
+      const dayOfWeek = new Date().getDay();
+      if (dayOfWeek === 0) {
+        collapseAll();
+        const rest = document.getElementById("section-rest");
+        if (rest) rest.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+
+      openCycleDay(dayOfWeek);
     }
 
     function syncAccordionMarkers() {
